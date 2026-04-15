@@ -207,7 +207,8 @@ export function BtcTicker() {
             <span ref={lineMeasureRef} className="xp-tray-ticker-line">
               {line}
             </span>
-            <span className="xp-tray-ticker-line" aria-hidden="true">
+            {/* Duplicate line for seamless marquee — `inert` hides from a11y tree without aria-hidden-inside-button issues (see axe aria-hidden-focus). */}
+            <span className="xp-tray-ticker-line" inert>
               {line}
             </span>
           </div>

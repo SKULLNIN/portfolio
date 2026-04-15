@@ -14,7 +14,8 @@ export const metadata: Metadata = {
   description:
     "Robotics & autonomous systems portfolio — PX4, ROS 2, Jetson, SLAM — in a Windows XP desktop.",
   icons: {
-    icon: "/icons/xp-my-computer.ico",
+    icon: "/favicon.png",
+    apple: "/favicon.png",
   },
 };
 

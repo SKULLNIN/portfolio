@@ -1,25 +1,24 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
-const BLISS = "/wallpapers/bliss.jpg";
+import { useEffect } from "react";
 
 type Props = {
-  /** ms */
+  /** ms before the portfolio shell is shown */
   duration?: number;
   onDone: () => void;
 };
 
-export function XpBootSplash({ duration = 2200, onDone }: Props) {
-  const [pct, setPct] = useState(0);
-
+/**
+ * Windows XP Professional–style boot screen — pure HTML/CSS (logo, bar, footer)
+ * matching the classic layout and sliding progress blocks.
+ */
+export function XpBootSplash({ duration = 2800, onDone }: Props) {
   useEffect(() => {
     const start = performance.now();
     let raf = 0;
     let finished = false;
     const tick = (now: number) => {
       const t = Math.min(1, (now - start) / duration);
-      setPct(Math.round(t * 100));
       if (t < 1) raf = requestAnimationFrame(tick);
       else if (!finished) {
         finished = true;
@@ -32,25 +31,52 @@ export function XpBootSplash({ duration = 2200, onDone }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-[1000] flex flex-col items-center justify-center bg-black"
-      role="presentation"
+      className="xp-boot-splash fixed inset-0 z-[1000] bg-black"
+      role="progressbar"
+      aria-busy="true"
+      aria-label="Starting Windows"
+      aria-valuetext="Loading"
     >
-      <div
-        className="absolute inset-0 bg-cover bg-center opacity-90"
-        style={{ backgroundImage: `url(${BLISS})` }}
-      />
-      <div className="relative z-[1] w-full max-w-md px-8 text-center font-['Tahoma',sans-serif] text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-        <p className="mb-2 text-[13px] font-bold tracking-wide">Windows XP</p>
-        <p className="mb-4 text-[11px] opacity-95">
-          Portfolio desktop is starting…
-        </p>
-        <div className="h-3 w-full overflow-hidden rounded-sm border border-[#1a3a7a] bg-[#1a1a1a] shadow-[inset_0_1px_2px_rgba(0,0,0,0.6)]">
-          <div
-            className="h-full bg-gradient-to-b from-[#6ab3ff] to-[#1c5fbf] transition-[width] duration-75"
-            style={{ width: `${pct}%` }}
-          />
+      <div className="xp-boot-screen-container">
+        <div className="xp-boot-logo-section">
+          <div className="xp-boot-windows-flag">
+            <div className="xp-boot-flag-pane xp-boot-flag-red" />
+            <div className="xp-boot-flag-pane xp-boot-flag-green" />
+            <div className="xp-boot-flag-pane xp-boot-flag-blue" />
+            <div className="xp-boot-flag-pane xp-boot-flag-yellow" />
+          </div>
+          <div className="xp-boot-brand-text">
+            <div className="xp-boot-microsoft-text">
+              Microsoft<sup>®</sup>
+            </div>
+            <div className="xp-boot-windows-text-line">
+              <span className="xp-boot-windows-text">Windows</span>
+              <span className="xp-boot-xp-text">xp</span>
+            </div>
+            <div className="xp-boot-professional-text">Professional</div>
+          </div>
         </div>
-        <p className="mt-2 text-[10px] opacity-80">For the full experience, use a desktop browser.</p>
+
+        <div className="xp-boot-progress-section">
+          <div className="xp-boot-progress-bar-container">
+            <div className="xp-boot-progress-bar-track">
+              <div className="xp-boot-progress-blocks">
+                <div className="xp-boot-progress-block" />
+                <div className="xp-boot-progress-block" />
+                <div className="xp-boot-progress-block" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="xp-boot-footer">
+          <div className="xp-boot-copyright-text">
+            Copyright © 1985-2001
+            <br />
+            Microsoft Corporation
+          </div>
+          <div className="xp-boot-microsoft-logo">Microsoft</div>
+        </div>
       </div>
     </div>
   );

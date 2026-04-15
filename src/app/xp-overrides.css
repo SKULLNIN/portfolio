@@ -3672,3 +3672,276 @@ a.ie-go-open-primary:active {
 .xp-dp-sample-win {
   box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.25);
 }
+
+/* ----- Windows XP Professional boot (HTML/CSS replica) ----- */
+.xp-boot-splash {
+  cursor: none;
+  user-select: none;
+  font-family: "Franklin Gothic Medium", "Trebuchet MS", Arial, sans-serif;
+}
+
+.xp-boot-screen-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.xp-boot-screen-container::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.15) 100%);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.xp-boot-screen-container::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 11;
+}
+
+.xp-boot-logo-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 40px;
+  position: relative;
+  z-index: 1;
+}
+
+.xp-boot-windows-flag {
+  width: 100px;
+  height: 90px;
+  position: relative;
+  margin-bottom: 12px;
+  transform: perspective(400px) rotateY(-8deg) rotateX(5deg);
+}
+
+.xp-boot-flag-pane {
+  position: absolute;
+  border-radius: 2px;
+}
+
+.xp-boot-flag-red {
+  width: 42px;
+  height: 38px;
+  top: 0;
+  left: 0;
+  background: linear-gradient(135deg, #ff4500 0%, #e83a00 30%, #cc2200 60%, #b81e00 100%);
+  border-radius: 0 6px 0 0;
+  transform: skewY(-3deg) skewX(3deg);
+  box-shadow:
+    inset 2px 2px 8px rgba(255, 150, 50, 0.5),
+    inset -2px -2px 6px rgba(100, 0, 0, 0.3);
+}
+
+.xp-boot-flag-green {
+  width: 42px;
+  height: 38px;
+  top: 2px;
+  left: 50px;
+  background: linear-gradient(135deg, #7ccc00 0%, #5cb800 30%, #3aa800 60%, #2a9600 100%);
+  border-radius: 0 0 6px 0;
+  transform: skewY(3deg) skewX(-3deg);
+  box-shadow:
+    inset 2px 2px 8px rgba(180, 255, 50, 0.4),
+    inset -2px -2px 6px rgba(0, 80, 0, 0.3);
+}
+
+.xp-boot-flag-blue {
+  width: 42px;
+  height: 38px;
+  top: 44px;
+  left: 2px;
+  background: linear-gradient(135deg, #3a7cff 0%, #2a5cee 30%, #0044dd 60%, #0033bb 100%);
+  border-radius: 0 0 0 6px;
+  transform: skewY(3deg) skewX(3deg);
+  box-shadow:
+    inset 2px 2px 8px rgba(100, 160, 255, 0.5),
+    inset -2px -2px 6px rgba(0, 0, 100, 0.3);
+}
+
+.xp-boot-flag-yellow {
+  width: 42px;
+  height: 38px;
+  top: 42px;
+  left: 48px;
+  background: linear-gradient(135deg, #ffcc00 0%, #f0b000 30%, #e8a000 60%, #d49000 100%);
+  border-radius: 0 0 6px 0;
+  transform: skewY(-3deg) skewX(-3deg);
+  box-shadow:
+    inset 2px 2px 8px rgba(255, 230, 100, 0.5),
+    inset -2px -2px 6px rgba(150, 100, 0, 0.3);
+}
+
+.xp-boot-brand-text {
+  text-align: center;
+}
+
+.xp-boot-microsoft-text {
+  color: #cccccc;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  margin-bottom: 2px;
+  font-family: "Trebuchet MS", Arial, sans-serif;
+}
+
+.xp-boot-microsoft-text sup {
+  font-size: 7px;
+  vertical-align: super;
+}
+
+.xp-boot-windows-text-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 1px;
+}
+
+.xp-boot-windows-text {
+  color: #ffffff;
+  font-size: 52px;
+  font-weight: bold;
+  letter-spacing: -1px;
+  font-family: "Franklin Gothic Medium", "Trebuchet MS", Arial, sans-serif;
+  line-height: 1;
+}
+
+.xp-boot-xp-text {
+  color: #ffffff;
+  font-size: 42px;
+  font-weight: 300;
+  font-family: "Franklin Gothic Medium", "Trebuchet MS", Arial, sans-serif;
+  font-style: italic;
+  position: relative;
+  top: -4px;
+  margin-left: 2px;
+  letter-spacing: 1px;
+}
+
+.xp-boot-professional-text {
+  color: #cccccc;
+  font-size: 22px;
+  font-weight: 300;
+  letter-spacing: 8px;
+  font-family: "Franklin Gothic Medium", "Trebuchet MS", Arial, sans-serif;
+  margin-top: 0;
+  text-indent: 8px;
+}
+
+.xp-boot-progress-section {
+  margin-top: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.xp-boot-progress-bar-container {
+  width: 220px;
+  height: 20px;
+  border: 1px solid #4a4a6a;
+  border-radius: 2px;
+  background: #000;
+  overflow: hidden;
+  position: relative;
+  padding: 2px;
+}
+
+.xp-boot-progress-bar-track {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.xp-boot-progress-blocks {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  animation: xp-boot-slide-blocks 2s linear infinite;
+  will-change: transform;
+}
+
+.xp-boot-progress-block {
+  width: 12px;
+  height: 14px;
+  border-radius: 1px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #5b8dff 0%, #3a6bdd 40%, #2855cc 70%, #1a44bb 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+@keyframes xp-boot-slide-blocks {
+  0% {
+    transform: translateX(-60px);
+  }
+  100% {
+    transform: translateX(220px);
+  }
+}
+
+.xp-boot-footer {
+  position: absolute;
+  bottom: 30px;
+  left: 0;
+  right: 0;
+  padding: 0 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  z-index: 1;
+}
+
+.xp-boot-copyright-text {
+  color: #aaaaaa;
+  font-size: 12px;
+  font-family: "Franklin Gothic Medium", "Trebuchet MS", Arial, sans-serif;
+  line-height: 1.5;
+}
+
+.xp-boot-microsoft-logo {
+  color: #888888;
+  font-size: 18px;
+  font-family: "Franklin Gothic Medium", "Trebuchet MS", Arial, sans-serif;
+  font-style: italic;
+  font-weight: bold;
+  letter-spacing: -0.5px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-boot-progress-blocks {
+    animation: none;
+    transform: translateX(72px);
+  }
+}

@@ -1,0 +1,21 @@
+@import "tailwindcss";
+@import "./xp-overrides.css";
+/* XP.css is loaded via <link> in layout.tsx so dev bundler does not parse invalid legacy selectors. */
+
+@theme inline {
+  --font-sans: Tahoma, "MS Sans Serif", Arial, sans-serif;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+body {
+  font-family: Tahoma, "MS Sans Serif", Arial, sans-serif;
+  font-size: 11px;
+  color: #222;
+  background: #000;
+}

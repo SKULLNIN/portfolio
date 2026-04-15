@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" aria-hidden="true">
+  <!-- XP-style empty Recycle Bin (portfolio asset) -->
+  <defs>
+    <linearGradient id="rb-bin" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e8ecf4"/>
+      <stop offset="45%" stop-color="#b8c4d8"/>
+      <stop offset="100%" stop-color="#8a9ab0"/>
+    </linearGradient>
+    <linearGradient id="rb-rim" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#d0dae8"/>
+      <stop offset="100%" stop-color="#7a8aa0"/>
+    </linearGradient>
+    <linearGradient id="rb-lid" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#c8d4e8"/>
+      <stop offset="100%" stop-color="#8898b0"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="24" cy="42" rx="14" ry="3" fill="#000" opacity="0.18"/>
+  <path fill="url(#rb-bin)" stroke="#5a6a80" stroke-width="1" d="M14 18h20l-1 22H15L14 18z"/>
+  <path fill="#000" opacity="0.08" d="M15 19h6v20h-5.5z"/>
+  <path fill="#fff" opacity="0.15" d="M28 19h5.5v20H28z"/>
+  <ellipse cx="24" cy="18" rx="11" ry="3.5" fill="url(#rb-rim)" stroke="#5a6a80" stroke-width="1"/>
+  <ellipse cx="24" cy="14" rx="9" ry="2.8" fill="url(#rb-lid)" stroke="#5a6a80" stroke-width="0.75"/>
+  <rect x="22" y="8" width="4" height="6" rx="1" fill="#8898a8" stroke="#5a6a80" stroke-width="0.5"/>
+  <path fill="#f0f4f8" stroke="#a0b0c8" stroke-width="0.5" opacity="0.85" d="M19 22h10v8l-2 2H19V22z"/>
+</svg>

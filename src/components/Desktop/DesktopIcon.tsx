@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import type { AppDefinition } from "@/types";
 import { useDeviceLayout } from "@/context/DeviceLayoutContext";
 import { useWindowManager } from "@/context/WindowContext";
@@ -17,10 +18,13 @@ const ICON_PX = { sm: 28, md: 36, lg: 48 } as const;
 export function DesktopIcon({ app, selected, onSelect, iconSize = "md" }: Props) {
   const { openApp } = useWindowManager();
   const { isTouchUi } = useDeviceLayout();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
-  const title = isTouchUi
-    ? `${app.desktopLabel} — tap to open`
-    : `${app.desktopLabel} — double-click to open`;
+  const title =
+    mounted && isTouchUi
+      ? `${app.desktopLabel} — tap to open`
+      : `${app.desktopLabel} — double-click to open`;
 
   const px = ICON_PX[iconSize];
 

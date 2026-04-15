@@ -104,13 +104,16 @@ export function WindowShell({ w, isActive, children }: Props) {
     .filter(Boolean)
     .join(" ");
 
+  /** Never force a window wider than the desktop client area (fixes narrow phones). */
+  const minWinW = Math.max(120, Math.min(280, vp.width));
+
   return (
     <Rnd
-      className="pointer-events-auto"
+      className="pointer-events-auto max-w-full"
       style={{ zIndex: w.zIndex }}
       size={rndSize}
       position={rndPosition}
-      minWidth={280}
+      minWidth={minWinW}
       minHeight={160}
       maxWidth={w.isMaximized ? vp.width : undefined}
       maxHeight={w.isMaximized ? vp.height : undefined}

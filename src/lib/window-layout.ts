@@ -22,7 +22,11 @@ export function computeInitialWindowFromViewport(
     size: { ...def.defaultSize },
   };
 
-  if (seg === "compact") {
+  /** Phones always; narrow tablets / portrait get full-area windows to avoid clipped chrome. */
+  const useFullBleed =
+    seg === "compact" || (seg === "tablet" && vp.width < 768);
+
+  if (useFullBleed) {
     const h = Math.max(160, vp.height - vp.taskbarInset);
     const w = vp.width;
     return {

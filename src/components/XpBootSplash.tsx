@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { BOOT_SPLASH_Z_INDEX } from "@/lib/constants";
 
 type Props = {
   /** ms before the portfolio shell is shown */
@@ -31,7 +32,8 @@ export function XpBootSplash({ duration = 2800, onDone }: Props) {
 
   return (
     <div
-      className="xp-boot-splash fixed inset-0 z-[1000] bg-black"
+      className="xp-boot-splash fixed inset-0 bg-black"
+      style={{ zIndex: BOOT_SPLASH_Z_INDEX }}
       role="progressbar"
       aria-busy="true"
       aria-label="Starting Windows"

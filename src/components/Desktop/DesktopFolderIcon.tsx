@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useDeviceLayout } from "@/context/DeviceLayoutContext";
 import { XP_ICONS } from "@/lib/xp-icons";
 
@@ -24,10 +25,13 @@ export function DesktopFolderIcon({
   onOpen,
 }: Props) {
   const { isTouchUi } = useDeviceLayout();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const px = ICON_PX[iconSize];
-  const title = isTouchUi
-    ? `${label} — tap to open`
-    : `${label} — double-click to open`;
+  const title =
+    mounted && isTouchUi
+      ? `${label} — tap to open`
+      : `${label} — double-click to open`;
 
   return (
     <div

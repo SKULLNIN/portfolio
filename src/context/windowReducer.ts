@@ -1,13 +1,50 @@
 import { APP_REGISTRY } from "@/data/apps";
+import { WINDOW_Z_INDEX_CAP } from "@/lib/constants";
 import { computeInitialWindowFromViewport } from "@/lib/window-layout";
 import type { AppId, OpenViewportPayload, WindowAction, WindowState } from "@/types";
 
 export type WindowsRecord = Record<AppId, WindowState>;
 
+/**
+ * When the max z-index exceeds this, we compact open windows to 1..N so
+ * values stay small. Must stay below {@link TASKBAR_SHELL_Z_INDEX} (see constants).
+ */
+const Z_COMPACT_THRESHOLD = 9000;
+
 function nextZIndex(windows: WindowsRecord): number {
-  return (
-    Math.max(0, ...Object.values(windows).map((w) => w.zIndex)) + 1
-  );
+  const max = Math.max(0, ...Object.values(windows).map((w) => w.zIndex));
+  return Math.min(max + 1, WINDOW_Z_INDEX_CAP);
+}
+
+/** Re-number z-indexes 1..N preserving order (called when max exceeds threshold). */
+function compactZIndexes(windows: WindowsRecord): WindowsRecord {
+  const entries = Object.values(windows)
+    .filter((w) => w.isOpen && !w.isMinimized)
+    .sort((a, b) => a.zIndex - b.zIndex);
+  const next = { ...windows };
+  entries.forEach((w, i) => {
+    next[w.id] = { ...next[w.id], zIndex: i + 1 };
+  });
+  // Closed / minimized windows get z 0
+  for (const w of Object.values(next)) {
+    if (!w.isOpen || w.isMinimized) {
+      next[w.id] = { ...next[w.id], zIndex: 0 };
+    }
+  }
+  return next;
+}
+
+/** Assign next z-index and compact if needed. */
+function withNextZ(windows: WindowsRecord, id: AppId, patch: Partial<WindowState>): WindowsRecord {
+  const z = nextZIndex(windows);
+  let result: WindowsRecord = {
+    ...windows,
+    [id]: { ...windows[id], ...patch, zIndex: z },
+  };
+  if (z > Z_COMPACT_THRESHOLD) {
+    result = compactZIndexes(result);
+  }
+  return result;
 }
 
 function createInitialWindow(
@@ -51,29 +88,19 @@ export function windowReducer(
   switch (action.type) {
     case "OPEN": {
       const existing = state[action.id];
-      const z = nextZIndex(state);
       if (existing?.isOpen) {
-        return {
-          ...state,
-          [action.id]: {
-            ...existing,
-            isMinimized: false,
-            zIndex: z,
-          },
-        };
-      }
-      if (existing && !existing.isOpen) {
-        const fresh = createInitialWindow(action.id, action.viewport);
-        return {
-          ...state,
-          [action.id]: { ...fresh, zIndex: z },
-        };
+        return withNextZ(state, action.id, { isMinimized: false });
       }
       const fresh = createInitialWindow(action.id, action.viewport);
-      return {
+      const z = nextZIndex(state);
+      let result: WindowsRecord = {
         ...state,
         [action.id]: { ...fresh, zIndex: z },
       };
+      if (z > Z_COMPACT_THRESHOLD) {
+        result = compactZIndexes(result);
+      }
+      return result;
     }
     case "CLOSE": {
       const w = state[action.id];
@@ -100,50 +127,32 @@ export function windowReducer(
     case "RESTORE": {
       const w = state[action.id];
       if (!w) return state;
-      const z = nextZIndex(state);
-      return {
-        ...state,
-        [action.id]: { ...w, isMinimized: false, zIndex: z },
-      };
+      return withNextZ(state, action.id, { isMinimized: false });
     }
     case "TOGGLE_MAXIMIZE": {
       const w = state[action.id];
       if (!w) return state;
       if (w.isMaximized) {
         const prev = w.preMaximize;
-        return {
-          ...state,
-          [action.id]: {
-            ...w,
-            isMaximized: false,
-            preMaximize: null,
-            position: prev?.position ?? w.position,
-            size: prev?.size ?? w.size,
-            zIndex: nextZIndex(state),
-          },
-        };
+        return withNextZ(state, action.id, {
+          isMaximized: false,
+          preMaximize: null,
+          position: prev?.position ?? w.position,
+          size: prev?.size ?? w.size,
+        });
       }
-      return {
-        ...state,
-        [action.id]: {
-          ...w,
-          isMaximized: true,
-          preMaximize: {
-            position: { ...w.position },
-            size: { ...w.size },
-          },
-          zIndex: nextZIndex(state),
+      return withNextZ(state, action.id, {
+        isMaximized: true,
+        preMaximize: {
+          position: { ...w.position },
+          size: { ...w.size },
         },
-      };
+      });
     }
     case "FOCUS": {
       const w = state[action.id];
       if (!w || !w.isOpen || w.isMinimized) return state;
-      const z = nextZIndex(state);
-      return {
-        ...state,
-        [action.id]: { ...w, zIndex: z },
-      };
+      return withNextZ(state, action.id, {});
     }
     case "MOVE": {
       const w = state[action.id];
@@ -169,11 +178,7 @@ export function windowReducer(
       const w = state[action.id];
       if (!w || !w.isOpen) return state;
       if (w.isMinimized) {
-        const z = nextZIndex(state);
-        return {
-          ...state,
-          [action.id]: { ...w, isMinimized: false, zIndex: z },
-        };
+        return withNextZ(state, action.id, { isMinimized: false });
       }
       return {
         ...state,

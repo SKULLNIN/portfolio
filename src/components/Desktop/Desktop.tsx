@@ -48,6 +48,8 @@ function defaultRows(): DesktopRow[] {
   return APP_ORDER.map((id) => ({ kind: "app" as const, id }));
 }
 
+type ArrangeMode = "name" | "type" | "size" | "modified";
+
 export function Desktop() {
   const { windows } = useWindowManager();
   const { desktopBackgroundStyle } = useSystemSettings();
@@ -59,6 +61,10 @@ export function Desktop() {
   const ctxMenuRef = useRef<HTMLUListElement | null>(null);
   const [showDisplayProperties, setShowDisplayProperties] = useState(false);
   const [folderBrowse, setFolderBrowse] = useState<DesktopFolder | null>(null);
+  const [, setArrangeMode] = useState<ArrangeMode>("name");
+  const [autoArrange, setAutoArrange] = useState(true);
+  const [showIcons, setShowIcons] = useState(true);
+  const [arrangeSubOpen, setArrangeSubOpen] = useState(false);
 
   const focusedId = useMemo(() => {
     let max = -1;
@@ -79,6 +85,7 @@ export function Desktop() {
       const t = e.target as Node | null;
       if (menu && t && menu.contains(t)) return;
       setCtx(null);
+      setArrangeSubOpen(false);
     };
     document.addEventListener("pointerdown", closeIfOutside);
     return () => document.removeEventListener("pointerdown", closeIfOutside);
@@ -116,7 +123,7 @@ export function Desktop() {
 
   return (
     <div
-      className="relative min-h-0 flex-1 overflow-hidden bg-[#4980c6] bg-cover bg-center bg-no-repeat"
+      className="relative min-h-0 min-w-0 w-full max-w-[100vw] flex-1 overflow-hidden bg-[#4980c6] bg-cover bg-center bg-no-repeat"
       style={desktopBackgroundStyle}
       onMouseDown={(e) => {
         const el = e.target as HTMLElement;
@@ -146,33 +153,124 @@ export function Desktop() {
       {ctx && (
         <ul
           ref={ctxMenuRef}
-          className="xp-desktop-ctx fixed z-[400] min-w-[180px] cursor-default border border-[#003c74] bg-[#ece9d8] py-0.5 text-[11px] text-black shadow-[4px_4px_12px_rgba(0,0,0,0.35)]"
+          className="xp-desktop-ctx fixed z-[400] min-w-[200px] cursor-default border border-[#003c74] bg-[#ece9d8] py-0.5 text-[11px] text-black shadow-[4px_4px_12px_rgba(0,0,0,0.35)]"
           style={{ left: ctx.x, top: ctx.y }}
           onPointerDown={(e) => e.stopPropagation()}
         >
+          {/* Arrange Icons By */}
+          <li className="xp-ctx-submenu-parent relative">
+            <button
+              type="button"
+              className="xp-ctx-btn"
+              onMouseEnter={() => setArrangeSubOpen(true)}
+              onMouseLeave={() => setArrangeSubOpen(false)}
+            >
+              <span>Arrange Icons By</span>
+              <span className="xp-ctx-arrow">▶</span>
+            </button>
+            {arrangeSubOpen && (
+              <ul
+                className="xp-ctx-submenu"
+                onMouseEnter={() => setArrangeSubOpen(true)}
+                onMouseLeave={() => setArrangeSubOpen(false)}
+              >
+                <li>
+                  <button type="button" className="xp-ctx-btn"
+                    onClick={() => { setArrangeMode("name"); setCtx(null); }}>
+                    Name
+                  </button>
+                </li>
+                <li>
+                  <button type="button" className="xp-ctx-btn"
+                    onClick={() => { setArrangeMode("size"); setCtx(null); }}>
+                    Size
+                  </button>
+                </li>
+                <li>
+                  <button type="button" className="xp-ctx-btn"
+                    onClick={() => { setArrangeMode("type"); setCtx(null); }}>
+                    Type
+                  </button>
+                </li>
+                <li>
+                  <button type="button" className="xp-ctx-btn"
+                    onClick={() => { setArrangeMode("modified"); setCtx(null); }}>
+                    Modified
+                  </button>
+                </li>
+                <li className="xp-ctx-sep" />
+                <li>
+                  <button type="button" className="xp-ctx-btn"
+                    onClick={() => { setShowIcons((v) => !v); setCtx(null); }}>
+                    {showIcons ? "✓ " : "  "}Show Desktop Icons
+                  </button>
+                </li>
+                <li>
+                  <button type="button" className="xp-ctx-btn"
+                    onClick={() => { setAutoArrange((v) => !v); setCtx(null); }}>
+                    {autoArrange ? "✓ " : "  "}Auto Arrange
+                  </button>
+                </li>
+                <li>
+                  <button type="button" className="xp-ctx-btn"
+                    onClick={() => setCtx(null)}>
+                    Align to Grid
+                  </button>
+                </li>
+              </ul>
+            )}
+          </li>
+          <li className="xp-ctx-sep" />
           <li>
             <button
               type="button"
-              className="block w-full px-3 py-1.5 text-left hover:bg-[var(--xp-accent)] hover:text-white"
+              className="xp-ctx-btn"
               onClick={refreshPage}
             >
               Refresh
             </button>
           </li>
-          <li className="my-0.5 border-t border-[#d4d0c8]" />
+          <li className="xp-ctx-sep" />
           <li>
             <button
               type="button"
-              className="block w-full px-3 py-1.5 text-left hover:bg-[var(--xp-accent)] hover:text-white"
-              onClick={newFolder}
+              className="xp-ctx-btn xp-ctx-disabled"
             >
-              New Folder
+              Paste
             </button>
           </li>
           <li>
             <button
               type="button"
-              className="block w-full px-3 py-1.5 text-left hover:bg-[var(--xp-accent)] hover:text-white"
+              className="xp-ctx-btn xp-ctx-disabled"
+            >
+              Paste Shortcut
+            </button>
+          </li>
+          <li>
+            <button
+              type="button"
+              className="xp-ctx-btn xp-ctx-disabled"
+            >
+              Undo Delete
+            </button>
+          </li>
+          <li className="xp-ctx-sep" />
+          {/* New submenu */}
+          <li>
+            <button
+              type="button"
+              className="xp-ctx-btn"
+              onClick={newFolder}
+            >
+              New &nbsp;→&nbsp; Folder
+            </button>
+          </li>
+          <li className="xp-ctx-sep" />
+          <li>
+            <button
+              type="button"
+              className="xp-ctx-btn"
               onClick={() => {
                 setShowDisplayProperties(true);
                 setCtx(null);
@@ -184,31 +282,33 @@ export function Desktop() {
         </ul>
       )}
 
-      <div
-        className="xp-desktop-grid wallpaper-grid"
-        onMouseDown={(e) => e.stopPropagation()}
-      >
-        {rows.map((row) =>
-          row.kind === "app" ? (
-            <DesktopIcon
-              key={row.id}
-              app={APP_REGISTRY[row.id]}
-              selected={selectedKey === `app:${row.id}`}
-              onSelect={() => setSelectedKey(`app:${row.id}`)}
-              iconSize="md"
-            />
-          ) : (
-            <DesktopFolderIcon
-              key={row.folder.key}
-              label={row.folder.name}
-              selected={selectedKey === `folder:${row.folder.key}`}
-              onSelect={() => setSelectedKey(`folder:${row.folder.key}`)}
-              iconSize="md"
-              onOpen={() => openFolder(row.folder)}
-            />
-          ),
-        )}
-      </div>
+      {showIcons && (
+        <div
+          className="xp-desktop-grid wallpaper-grid"
+          onMouseDown={(e) => e.stopPropagation()}
+        >
+          {rows.map((row) =>
+            row.kind === "app" ? (
+              <DesktopIcon
+                key={row.id}
+                app={APP_REGISTRY[row.id]}
+                selected={selectedKey === `app:${row.id}`}
+                onSelect={() => setSelectedKey(`app:${row.id}`)}
+                iconSize="md"
+              />
+            ) : (
+              <DesktopFolderIcon
+                key={row.folder.key}
+                label={row.folder.name}
+                selected={selectedKey === `folder:${row.folder.key}`}
+                onSelect={() => setSelectedKey(`folder:${row.folder.key}`)}
+                iconSize="md"
+                onOpen={() => openFolder(row.folder)}
+              />
+            ),
+          )}
+        </div>
+      )}
 
       {ALL_APP_IDS.map((id) => {
         const w = windows[id];

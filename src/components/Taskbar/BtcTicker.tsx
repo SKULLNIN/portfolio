@@ -190,8 +190,8 @@ export function BtcTicker() {
         <img
           src="/icons/btc-pixel.svg"
           alt=""
-          width={14}
-          height={14}
+          width={12}
+          height={12}
           className="xp-pixel-icon shrink-0"
         />
         <div
@@ -236,7 +236,7 @@ export function BtcTicker() {
             </button>
           </div>
           <p className="border-b border-[#d4d0c8] px-2 py-1 text-[10px] text-[#555]">
-            CoinGecko · refreshes every minute
+            CoinGecko / Binance spot (USD) · refreshes every minute
           </p>
           <table className="w-full border-collapse text-[11px]">
             <tbody>

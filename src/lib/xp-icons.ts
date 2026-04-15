@@ -1,16 +1,52 @@
 /**
  * App icons — PNGs in `public/icons/hires/` (high-res Windows XP–style assets).
  * `media-player.png` from [B00merang Windows-XP](https://github.com/B00merang-Artwork/Windows-XP) (GPL-2.0).
+ * Most additional icons from "Windows XP High Resolution Icon Pack".
  */
 export const XP_ICONS = {
   myComputer: "/icons/hires/my-computer.png",
-  myDocuments: "/icons/folder-xp.svg",
-  myPictures: "/icons/folder-xp.svg",
-  /** XP-style empty Recycle Bin (`public/icons/recycle-bin-xp.svg`). */
-  recycleBin: "/icons/recycle-bin-xp.svg?v=3",
+  myDocuments: "/icons/hires/my-documents.png",
+  myPictures: "/icons/hires/my-pictures.png",
+  /** XP-style empty Recycle Bin */
+  recycleBin: "/icons/hires/recycle-bin.png",
   notepad: "/icons/hires/notepad.png",
   internetExplorer: "/icons/hires/internet-explorer.png",
   minesweeper: "/icons/hires/minesweeper.png",
   mediaPlayer: "/icons/hires/media-player.png",
-  controlPanel: "/icons/control-panel-xp.svg",
+  controlPanel: "/icons/hires/control-panel.png",
+  // Additional XP system icons
+  folder: "/icons/hires/folder-closed.png",
+  localDisk: "/icons/hires/local-disk.png",
+  floppyDisk: "/icons/hires/floppy-disk.png",
+  cdRom: "/icons/hires/cd-rom.png",
+  sharedFolder: "/icons/hires/shared-folder.png",
+  networkConnection: "/icons/hires/network-connection.png",
+  networkPlaces: "/icons/hires/network-places.png",
+  helpSupport: "/icons/hires/help-support.png",
+  search: "/icons/hires/search.png",
+  run: "/icons/hires/run.png",
+  logout: "/icons/hires/logout.png",
+  power: "/icons/hires/power.png",
+  volume: "/icons/hires/volume.png",
+  userAccounts: "/icons/hires/user-accounts.png",
+  keyboard: "/icons/hires/keyboard.png",
+  mouse: "/icons/hires/mouse.png",
+  dateTime: "/icons/hires/date-time.png",
+  printer: "/icons/hires/printer.png",
+  accessibility: "/icons/hires/accessibility.png",
+  performance: "/icons/hires/performance.png",
+  displayProperties: "/icons/hires/display-properties.png",
+  systemProperties: "/icons/hires/system-properties.png",
+  taskManager: "/icons/hires/task-manager.png",
+  myMusic: "/icons/hires/my-music.png",
+  myVideos: "/icons/hires/my-videos.png",
+  recentDocs: "/icons/hires/recent-docs.png",
+  outlookExpress: "/icons/hires/outlook-express.png",
+  programs: "/icons/hires/programs.png",
+  calculator: "/icons/hires/calculator.png",
+  paint: "/icons/hires/paint.png",
+  wordpad: "/icons/hires/wordpad.png",
+  txt: "/icons/hires/txt.png",
+  firewall: "/icons/hires/firewall.png",
+  securityCenter: "/icons/hires/security-center.png",
 } as const;

@@ -1,4 +1,5 @@
 import { OWNER, PROJECTS } from "@/data/portfolio-content";
+import { XP_ICONS } from "@/lib/xp-icons";
 
 /** System / registration copy for Control Panel applets */
 export const CP_SYSTEM = {
@@ -42,7 +43,7 @@ export const CP_SKILLS: Record<string, { name: string; pct: number }[]> = {
 };
 
 export const CP_PROGRAMS = PROJECTS.map((p) => ({
-  ico: "📁",
+  ico: XP_ICONS.folder,
   name: p.title,
   type: p.short,
   size: "~—",
@@ -73,7 +74,7 @@ export const CP_ACCENT_COLORS = [
   "#666666",
 ];
 
-/** Category View rows — order matches classic XP “Pick a category” screen */
+/** Category View rows — order matches classic XP "Pick a category" screen */
 export type CpAppletId =
   | "display"
   | "printers"
@@ -88,13 +89,13 @@ export type CpAppletId =
 
 export const CP_CATEGORY_ROWS: {
   title: string;
-  emoji: string;
+  icon: string;
   applet: CpAppletId;
   subs: { label: string; applet: CpAppletId; tab?: number }[];
 }[] = [
   {
     title: "Appearance and Themes",
-    emoji: "🎨",
+    icon: XP_ICONS.displayProperties,
     applet: "display",
     subs: [
       { label: "Change the desktop background", applet: "display", tab: 0 },
@@ -104,7 +105,7 @@ export const CP_CATEGORY_ROWS: {
   },
   {
     title: "Printers and Other Hardware",
-    emoji: "🖨️",
+    icon: XP_ICONS.printer,
     applet: "printers",
     subs: [
       { label: "View installed printers", applet: "printers" },
@@ -113,7 +114,7 @@ export const CP_CATEGORY_ROWS: {
   },
   {
     title: "Network and Internet Connections",
-    emoji: "🌐",
+    icon: XP_ICONS.networkConnection,
     applet: "network",
     subs: [
       { label: "Set up or change your Internet connection", applet: "network" },
@@ -122,7 +123,7 @@ export const CP_CATEGORY_ROWS: {
   },
   {
     title: "User Accounts",
-    emoji: "👤",
+    icon: XP_ICONS.userAccounts,
     applet: "user",
     subs: [
       { label: "Change an account", applet: "user", tab: 0 },
@@ -131,7 +132,7 @@ export const CP_CATEGORY_ROWS: {
   },
   {
     title: "Add or Remove Programs",
-    emoji: "📦",
+    icon: XP_ICONS.programs,
     applet: "addremove",
     subs: [
       { label: "Install or uninstall programs", applet: "addremove" },
@@ -140,13 +141,13 @@ export const CP_CATEGORY_ROWS: {
   },
   {
     title: "Date, Time, Language, and Regional Options",
-    emoji: "🕐",
+    icon: XP_ICONS.dateTime,
     applet: "datetime",
     subs: [{ label: "Change the date and time", applet: "datetime" }],
   },
   {
     title: "Sounds, Speech, and Audio Devices",
-    emoji: "🔊",
+    icon: XP_ICONS.volume,
     applet: "sounds",
     subs: [
       { label: "Adjust system volume", applet: "sounds" },
@@ -155,13 +156,13 @@ export const CP_CATEGORY_ROWS: {
   },
   {
     title: "Accessibility Options",
-    emoji: "♿",
+    icon: XP_ICONS.accessibility,
     applet: "access",
     subs: [{ label: "Adjust for vision, hearing, and mobility", applet: "access" }],
   },
   {
     title: "Performance and Maintenance",
-    emoji: "📊",
+    icon: XP_ICONS.performance,
     applet: "system",
     subs: [
       { label: "View basic system information", applet: "system" },
@@ -170,7 +171,7 @@ export const CP_CATEGORY_ROWS: {
   },
   {
     title: "Skills & Technologies",
-    emoji: "⭐",
+    icon: XP_ICONS.systemProperties,
     applet: "skills",
     subs: [
       { label: "View installed skills and proficiency", applet: "skills", tab: 0 },
@@ -180,14 +181,14 @@ export const CP_CATEGORY_ROWS: {
 ];
 
 export const CP_CLASSIC_APPLETS: { ico: string; name: string; id: CpAppletId }[] = [
-  { ico: "🎨", name: "Display", id: "display" },
-  { ico: "🖨️", name: "Printers and Faxes", id: "printers" },
-  { ico: "🌐", name: "Network Connections", id: "network" },
-  { ico: "🔊", name: "Sounds and Audio", id: "sounds" },
-  { ico: "💻", name: "System", id: "system" },
-  { ico: "📦", name: "Add or Remove Programs", id: "addremove" },
-  { ico: "👤", name: "User Accounts", id: "user" },
-  { ico: "🕐", name: "Date and Time", id: "datetime" },
-  { ico: "♿", name: "Accessibility Options", id: "access" },
-  { ico: "⭐", name: "Skills", id: "skills" },
+  { ico: XP_ICONS.displayProperties, name: "Display", id: "display" },
+  { ico: XP_ICONS.printer, name: "Printers and Faxes", id: "printers" },
+  { ico: XP_ICONS.networkConnection, name: "Network Connections", id: "network" },
+  { ico: XP_ICONS.volume, name: "Sounds and Audio", id: "sounds" },
+  { ico: XP_ICONS.systemProperties, name: "System", id: "system" },
+  { ico: XP_ICONS.programs, name: "Add or Remove Programs", id: "addremove" },
+  { ico: XP_ICONS.userAccounts, name: "User Accounts", id: "user" },
+  { ico: XP_ICONS.dateTime, name: "Date and Time", id: "datetime" },
+  { ico: XP_ICONS.accessibility, name: "Accessibility Options", id: "access" },
+  { ico: XP_ICONS.performance, name: "Skills", id: "skills" },
 ];

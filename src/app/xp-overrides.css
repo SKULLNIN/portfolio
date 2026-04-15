@@ -4449,6 +4449,42 @@ a.ie-go-open-primary:active {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, rgba(0, 0, 0, 0.04) 100%);
 }
 
+.xp-fullscreen-prompt-enter {
+  border-color: #2a7a2a;
+  background: linear-gradient(180deg, #6ac06a 0%, #3a903a 55%, #2a802a 100%);
+  font-weight: bold;
+}
+
+.xp-fullscreen-prompt-enter:hover {
+  background: linear-gradient(180deg, #7ad07a 0%, #4aa04a 55%, #3a903a 100%);
+}
+
+/* Always-visible desktop control — above windows, below the fullscreen modal */
+.xp-fullscreen-chip {
+  position: fixed;
+  left: max(8px, env(safe-area-inset-left, 0px));
+  bottom: calc(38px + env(safe-area-inset-bottom, 0px));
+  padding: 5px 12px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: linear-gradient(180deg, rgba(60, 120, 200, 0.95) 0%, rgba(20, 60, 140, 0.98) 100%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  font-family: Tahoma, "MS Sans Serif", sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  color: #fff;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.xp-fullscreen-chip:hover {
+  filter: brightness(1.08);
+}
+
+.xp-fullscreen-chip:active {
+  filter: brightness(0.95);
+}
+
 /* ====================================================================
    Logoff Dialog — Windows XP "Log Off Windows"
    ==================================================================== */

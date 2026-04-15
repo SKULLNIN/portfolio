@@ -10,6 +10,7 @@ import { Desktop } from "@/components/Desktop/Desktop";
 import { Taskbar } from "@/components/Taskbar/Taskbar";
 import { TouchPointerOverlay } from "@/components/TouchPointerOverlay";
 import { XpBootSplash } from "@/components/XpBootSplash";
+import { FullscreenPrompt } from "@/components/FullscreenPrompt";
 import { XpWelcomeScreen } from "@/components/XpWelcomeScreen";
 import { TASKBAR_HEIGHT_PX, TASKBAR_SHELL_Z_INDEX } from "@/lib/constants";
 
@@ -65,6 +66,7 @@ function ShellInner() {
 
   return (
     <>
+      <FullscreenPrompt phase={phase} />
       {phase === "boot" && <XpBootSplash onDone={onBootDone} />}
       {phase === "welcome" && <XpWelcomeScreen onLogin={onLoginDone} />}
       <div

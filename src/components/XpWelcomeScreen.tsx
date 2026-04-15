@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { WELCOME_SCREEN_Z_INDEX } from "@/lib/constants";
+import { requestAppFullscreen } from "@/lib/fullscreen";
 import {
   playWindowsXpShutdownSound,
   playWindowsXpStartSound,
@@ -23,6 +24,7 @@ export function XpWelcomeScreen({ onLogin }: Props) {
   const [phase, setPhase] = useState<"welcome" | "logging-in">("welcome");
 
   const handleGuestClick = useCallback(() => {
+    void requestAppFullscreen().catch(() => {});
     playWindowsXpStartSound();
     setPhase("logging-in");
     setTimeout(() => {

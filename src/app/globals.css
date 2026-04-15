@@ -32,3 +32,21 @@ body {
   /* iOS safe-area friendly full height */
   min-height: 100dvh;
 }
+
+/* Fullscreen API: paint the host and fill layout so the desktop is not a blank/black layer */
+html:fullscreen,
+html:-webkit-full-screen,
+body:fullscreen,
+body:-webkit-full-screen {
+  background-color: #000;
+  width: 100%;
+  min-height: 100%;
+}
+
+html:fullscreen .xp-shell,
+html:-webkit-full-screen .xp-shell,
+body:fullscreen .xp-shell,
+body:-webkit-full-screen .xp-shell {
+  min-height: 100%;
+  min-height: 100dvh;
+}

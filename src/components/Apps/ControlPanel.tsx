@@ -295,7 +295,6 @@ export function ControlPanel() {
       {dialog && dialogDef && (
         <div
           className="xp-cp-overlay"
-          role="presentation"
           onClick={(e) => {
             if (e.target === e.currentTarget) closeDialog();
           }}

@@ -82,7 +82,6 @@ export function DisplayPropertiesDialog({ open, onClose }: Props) {
   return (
     <div
       className="xp-dp-overlay pointer-events-auto fixed inset-0 z-[500] flex items-center justify-center bg-black/20 p-4"
-      role="presentation"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}

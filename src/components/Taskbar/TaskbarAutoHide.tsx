@@ -42,12 +42,13 @@ export function TaskbarAutoHide({ children }: Props) {
   return (
     <>
       {!expanded && (
-        <div
-          className="pointer-events-auto fixed bottom-0 left-0 right-0 z-[103]"
+        <button
+          type="button"
+          className="pointer-events-auto fixed bottom-0 left-0 right-0 z-[103] cursor-default border-0 bg-transparent p-0 outline-none focus:outline-none"
           style={{ height: PEEK_HIT_PX }}
           onMouseEnter={show}
           onFocus={show}
-          aria-hidden
+          aria-label="Show taskbar"
         />
       )}
       <div

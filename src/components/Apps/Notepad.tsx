@@ -74,7 +74,8 @@ export function Notepad() {
         type="file"
         accept=".txt,text/plain"
         className="hidden"
-        aria-hidden
+        tabIndex={-1}
+        aria-label="Open a text file"
         onChange={onOpenFile}
       />
       <NotepadChrome

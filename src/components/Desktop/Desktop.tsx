@@ -29,11 +29,14 @@ const APP_CONTENT: Record<AppId, React.ReactNode> = {
   "control-panel": <ControlPanel />,
 };
 
+type DesktopIconSize = "sm" | "md" | "lg";
+
 export function Desktop() {
   const { windows } = useWindowManager();
   const { desktopBackgroundStyle } = useSystemSettings();
   const [selectedId, setSelectedId] = useState<AppId | null>(null);
   const [ctx, setCtx] = useState<{ x: number; y: number } | null>(null);
+  const [desktopIconSize, setDesktopIconSize] = useState<DesktopIconSize>("md");
 
   const focusedId = useMemo(() => {
     let max = -1;
@@ -88,6 +91,42 @@ export function Desktop() {
             <button
               type="button"
               className="block w-full px-3 py-1.5 text-left hover:bg-[var(--xp-accent)] hover:text-white"
+              onClick={() => {
+                setDesktopIconSize("lg");
+                setCtx(null);
+              }}
+            >
+              View → Large icons
+            </button>
+          </li>
+          <li>
+            <button
+              type="button"
+              className="block w-full px-3 py-1.5 text-left hover:bg-[var(--xp-accent)] hover:text-white"
+              onClick={() => {
+                setDesktopIconSize("md");
+                setCtx(null);
+              }}
+            >
+              View → Medium icons
+            </button>
+          </li>
+          <li>
+            <button
+              type="button"
+              className="block w-full px-3 py-1.5 text-left hover:bg-[var(--xp-accent)] hover:text-white"
+              onClick={() => {
+                setDesktopIconSize("sm");
+                setCtx(null);
+              }}
+            >
+              View → Small icons
+            </button>
+          </li>
+          <li>
+            <button
+              type="button"
+              className="block w-full px-3 py-1.5 text-left hover:bg-[var(--xp-accent)] hover:text-white"
               onClick={() => setCtx(null)}
             >
               Refresh
@@ -125,6 +164,7 @@ export function Desktop() {
             app={APP_REGISTRY[id]}
             selected={selectedId === id}
             onSelect={() => setSelectedId(id)}
+            iconSize={desktopIconSize}
           />
         ))}
       </div>

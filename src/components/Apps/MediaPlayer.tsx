@@ -9,19 +9,19 @@ import {
 } from "react";
 import { useSystemSettings } from "@/context/SystemSettingsContext";
 
-/** Royalty-free MP3 demos (SoundHelix). Classic Windows startup sounds are Microsoft-owned. */
+/** Local files in `public/music/` */
 const TRACKS: { title: string; src: string }[] = [
   {
-    title: "Ambient demo 1",
-    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+    title: "my",
+    src: "/music/whatsapp-2026-04-15-082437.mpeg",
   },
   {
-    title: "Ambient demo 2",
-    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+    title: "life",
+    src: "/music/whatsapp-2026-04-15-082432.mpeg",
   },
   {
-    title: "Ambient demo 3",
-    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+    title: "sucks",
+    src: "/music/whatsapp-2026-04-15-082431.mpeg",
   },
 ];
 
@@ -112,9 +112,9 @@ export function MediaPlayer() {
       </div>
       <div className="min-h-0 flex-1 overflow-auto p-3">
         <p className="mb-2 text-[#333]">
-          Playlist uses royalty-free SoundHelix streams. Drop your own tracks under{" "}
-          <code className="rounded bg-[#ddd] px-0.5">public/music/</code> if you extend this
-          player later.
+          Audio files live in <code className="rounded bg-[#ddd] px-0.5">public/music/</code>{" "}
+          (replace the <code className="rounded bg-[#ddd] px-0.5">.mpeg</code> files to update
+          the playlist).
         </p>
         {err && (
           <p className="mb-2 rounded border border-[#800] bg-[#fdd] px-2 py-1 text-[11px] text-[#800]">
@@ -122,6 +122,7 @@ export function MediaPlayer() {
           </p>
         )}
         <audio
+          key={track.src}
           ref={audioRef}
           src={track.src}
           preload="metadata"
@@ -139,7 +140,9 @@ export function MediaPlayer() {
         />
         <div className="mb-3 rounded border border-[#aca899] bg-[#f5f4ef] p-3 shadow-[inset_1px_1px_0_#fff]">
           <div className="mb-1 font-bold">{track.title}</div>
-          <div className="mb-2 text-[#666]">{track.src}</div>
+          <div className="mb-2 truncate text-[#666]">
+            {track.src.replace(/^.*\//, "")}
+          </div>
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -190,13 +193,13 @@ export function MediaPlayer() {
           </div>
         </div>
         <div className="text-[11px] font-bold text-[#0a246a]">Playlist</div>
-        <ul className="mt-1 border border-[#aca899] bg-white">
+        <ul className="m-0 mt-1 list-none space-y-0.5 border border-[#aca899] bg-white p-0.5">
           {TRACKS.map((tr, i) => (
             <li key={tr.src}>
               <button
                 type="button"
-                className={`w-full px-2 py-1.5 text-left hover:bg-[var(--xp-accent)] hover:text-white ${
-                  i === idx ? "bg-[var(--xp-accent)] text-white" : ""
+                className={`xp-mc-project-btn ${
+                  i === idx ? "xp-mc-project-btn--selected" : ""
                 }`}
                 onClick={() => {
                   setPlaying(false);
@@ -206,7 +209,7 @@ export function MediaPlayer() {
                   setIdx(i);
                 }}
               >
-                {tr.title}
+                <span className="font-bold">{tr.title}</span>
               </button>
             </li>
           ))}

@@ -1,12 +1,20 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
+  themeColor: "#245edc",
+};
 
 export const metadata: Metadata = {
   title: "Laxmesh Ankola — Portfolio (Windows XP)",
   description:
     "Robotics & autonomous systems portfolio — PX4, ROS 2, Jetson, SLAM — in a Windows XP desktop.",
   icons: {
-    icon: "/icons/xp-internet-explorer.ico",
+    icon: "/icons/xp-my-computer.ico",
   },
 };
 

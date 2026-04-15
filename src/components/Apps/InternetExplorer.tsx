@@ -35,7 +35,7 @@ export function InternetExplorer() {
   const { openApp } = useWindowManager();
   const icon = APP_REGISTRY["internet-explorer"].icon;
   const [nav, setNav] = useState<Nav>({ urls: ["about:home"], idx: 0 });
-  const [addressInput, setAddressInput] = useState("about:blank");
+  const [addressInput, setAddressInput] = useState("about:home");
   const [status, setStatus] = useState("Done");
   const [msg, setMsg] = useState<string | null>(null);
   const [iframeKey, setIframeKey] = useState(0);

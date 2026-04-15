@@ -30,8 +30,15 @@ export interface WindowState {
   preMaximize: { position: { x: number; y: number }; size: { width: number; height: number } } | null;
 }
 
+/** Passed on OPEN so new windows fit phone/tablet visual viewport. */
+export type OpenViewportPayload = {
+  width: number;
+  height: number;
+  taskbarInset: number;
+};
+
 export type WindowAction =
-  | { type: "OPEN"; id: AppId }
+  | { type: "OPEN"; id: AppId; viewport?: OpenViewportPayload }
   | { type: "CLOSE"; id: AppId }
   | { type: "MINIMIZE"; id: AppId }
   | { type: "RESTORE"; id: AppId }

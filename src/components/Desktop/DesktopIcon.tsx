@@ -1,28 +1,47 @@
 "use client";
 
 import type { AppDefinition } from "@/types";
+import { useDeviceLayout } from "@/context/DeviceLayoutContext";
 import { useWindowManager } from "@/context/WindowContext";
 
 type Props = {
   app: AppDefinition;
   selected: boolean;
   onSelect: () => void;
+  /** Wallpaper icon size — right-click desktop View (XP-style). */
+  iconSize?: "sm" | "md" | "lg";
 };
 
-export function DesktopIcon({ app, selected, onSelect }: Props) {
+const ICON_PX = { sm: 28, md: 36, lg: 48 } as const;
+
+export function DesktopIcon({ app, selected, onSelect, iconSize = "md" }: Props) {
   const { openApp } = useWindowManager();
+  const { isTouchUi } = useDeviceLayout();
+
+  const title = isTouchUi
+    ? `${app.desktopLabel} — tap to open`
+    : `${app.desktopLabel} — double-click to open`;
+
+  const px = ICON_PX[iconSize];
 
   return (
     <div
       role="button"
       tabIndex={0}
-      title={`${app.desktopLabel} — double-click to open`}
+      title={title}
       className={`cell ${selected ? "cell--selected" : ""}`}
       onMouseDown={(e) => {
         e.stopPropagation();
-        onSelect();
+        if (!isTouchUi) onSelect();
       }}
-      onDoubleClick={() => openApp(app.id)}
+      onClick={(e) => {
+        if (!isTouchUi) return;
+        e.stopPropagation();
+        openApp(app.id);
+      }}
+      onDoubleClick={() => {
+        if (!isTouchUi) openApp(app.id);
+      }}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
@@ -32,11 +51,12 @@ export function DesktopIcon({ app, selected, onSelect }: Props) {
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        className="h-9 w-9 object-contain [image-rendering:auto]"
+        className="object-contain [image-rendering:auto]"
+        style={{ width: px, height: px }}
         src={app.icon}
         alt=""
-        width={36}
-        height={36}
+        width={px}
+        height={px}
       />
       <span className="cell-name">{app.desktopLabel}</span>
     </div>

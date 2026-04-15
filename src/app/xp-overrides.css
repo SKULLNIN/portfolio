@@ -910,6 +910,8 @@
 }
 
 .xp-explorer-toolbar {
+  position: relative;
+  z-index: 2;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -1041,6 +1043,111 @@
 
 .xp-explorer-toolbtn--icon {
   padding: 2px 4px;
+}
+
+.xp-explorer-toolbtn:disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.xp-explorer-view-menu {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  z-index: 50;
+  margin: 2px 0 0;
+  min-width: 148px;
+  padding: 2px 0;
+  list-style: none;
+  border: 1px solid #aca899;
+  background: #fff;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.xp-explorer-view-menu-item {
+  display: block;
+  width: 100%;
+  padding: 4px 10px 4px 20px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  font-family: Tahoma, "Segoe UI", sans-serif;
+  font-size: 11px;
+  color: #000;
+  cursor: default;
+}
+
+.xp-explorer-view-menu-item:hover {
+  background: var(--xp-accent, #316ac5);
+  color: #fff;
+}
+
+.xp-explorer-view-menu-item--active {
+  font-weight: bold;
+}
+
+/* Explorer toolbar — Back / Forward history dropdowns (IE-style clusters use .xp-ie-*) */
+.xp-explorer-history-menu {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  z-index: 60;
+  margin: 2px 0 0;
+  min-width: 180px;
+  max-height: min(240px, 45vh);
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 2px 0;
+  list-style: none;
+  border: 1px solid #aca899;
+  background: #fff;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.xp-explorer-history-menu-item {
+  display: block;
+  width: 100%;
+  padding: 4px 10px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  font-family: Tahoma, "Segoe UI", sans-serif;
+  font-size: 11px;
+  color: #000;
+  cursor: default;
+}
+
+.xp-explorer-history-menu-item:hover {
+  background: var(--xp-accent, #316ac5);
+  color: #fff;
+}
+
+.xp-explorer-search-strip {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px 6px;
+  background: #ece9d8;
+  border-bottom: 1px solid #aca899;
+}
+
+.xp-explorer-search-label {
+  flex-shrink: 0;
+  width: 52px;
+  font-family: Tahoma, "Segoe UI", sans-serif;
+  font-size: 11px;
+  color: #555;
+}
+
+.xp-explorer-search-input {
+  flex: 1;
+  min-width: 0;
+  font-family: Tahoma, "Segoe UI", sans-serif;
+  font-size: 11px;
+  padding: 3px 6px;
+  border: 1px solid #7f9db9;
+  background: #fff;
 }
 
 .xp-explorer-address {
@@ -1912,6 +2019,145 @@
   background: radial-gradient(circle at 35% 35%, #f5f5f5, #a8a8a8 55%, #707070);
   border: 2px solid #666;
   box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.35);
+}
+
+/* My Computer — project list selection (fixed XP blue; does not follow Control Panel accent) */
+.xp-mc-project-btn {
+  width: 100%;
+  border-radius: 2px;
+  border: 1px solid transparent;
+  padding: 6px 8px;
+  text-align: left;
+  font-family: Tahoma, "Segoe UI", sans-serif;
+  font-size: 11px;
+  line-height: 1.25;
+  color: #000;
+  background: transparent;
+  cursor: pointer;
+}
+.xp-mc-project-btn .xp-mc-project-sub {
+  color: #555;
+}
+.xp-mc-project-btn:hover:not(.xp-mc-project-btn--selected) {
+  border-color: #aca899;
+  background: linear-gradient(180deg, #f7fbff 0%, #e8f0ff 100%);
+}
+.xp-mc-project-btn--selected {
+  border-color: #245edc;
+  background: linear-gradient(180deg, #5a8fd8 0%, #316ac5 55%, #2a5cb0 100%);
+  color: #fff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+.xp-mc-project-btn--selected .xp-mc-project-sub {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+/* Project detail pane — typography & gallery */
+.xp-mc-project-detail {
+  font-family: Tahoma, "Segoe UI", sans-serif;
+}
+.xp-mc-project-detail h2 {
+  font-size: 13px;
+  line-height: 1.35;
+  font-weight: bold;
+  color: #0a246a;
+}
+.xp-mc-project-detail .xp-mc-project-body {
+  font-size: 12px;
+  line-height: 1.55;
+  color: #222;
+}
+.xp-mc-project-tech {
+  font-family: Tahoma, "Segoe UI", sans-serif;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #222;
+}
+.xp-mc-project-hero {
+  border: 1px solid #d4d0c8;
+  background: linear-gradient(180deg, #f2f2f2 0%, #e4e4e4 100%);
+}
+.xp-mc-project-hero img {
+  display: block;
+  width: 100%;
+  max-height: 240px;
+  object-fit: contain;
+  object-position: center;
+}
+
+.xp-mc-project-video-inner {
+  border: 1px solid #d4d0c8;
+  border-radius: 2px;
+  background: #000;
+  overflow: hidden;
+}
+.xp-mc-project-video-el {
+  display: block;
+  width: 100%;
+  max-height: 280px;
+  vertical-align: middle;
+}
+.xp-mc-gallery-title {
+  margin: 0 0 6px;
+  font-family: Tahoma, "Segoe UI", sans-serif;
+  font-size: 12px;
+  font-weight: bold;
+  color: #003399;
+}
+.xp-mc-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+}
+.xp-mc-gallery-cell {
+  border: 1px solid #d4d0c8;
+  border-radius: 2px;
+  background: #f0f0f0;
+  overflow: hidden;
+}
+.xp-mc-gallery-cell img {
+  display: block;
+  width: 100%;
+  height: 120px;
+  object-fit: contain;
+  object-position: center;
+  background: #e8e8e8;
+}
+.xp-mc-gallery-caption {
+  margin: 0;
+  padding: 4px 6px;
+  font-size: 10px;
+  line-height: 1.35;
+  color: #333;
+  border-top: 1px solid #dcdcdc;
+  background: #fafafa;
+}
+.xp-mc-gallery-more {
+  display: flex;
+  min-height: 120px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: 2px dashed #b0b0b0;
+  border-radius: 2px;
+  background: repeating-linear-gradient(
+    -45deg,
+    #f6f6f6,
+    #f6f6f6 6px,
+    #efefef 6px,
+    #efefef 12px
+  );
+  color: #555;
+  font-size: 22px;
+  font-weight: bold;
+}
+.xp-mc-gallery-more span:last-child {
+  font-size: 10px;
+  font-weight: normal;
+  color: #666;
+  text-align: center;
+  padding: 0 8px;
 }
 
 /* Maximized: flat to screen edges, hide side accent strips */
@@ -3289,4 +3535,53 @@ a.ie-go-open-primary:active {
   border-radius: 50%;
   background: #fff;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+/* ----- Responsive: tablet / phone / Android ----- */
+[data-segment="compact"] .xp-desktop-grid.wallpaper-grid {
+  grid-auto-columns: 88px;
+  grid-template-columns: repeat(auto-fill, 88px);
+  grid-gap: 8px 4px;
+  left: 4px;
+  top: 4px;
+}
+
+[data-segment="tablet"] .xp-desktop-grid.wallpaper-grid {
+  grid-auto-columns: 96px;
+  grid-template-columns: repeat(auto-fill, 96px);
+  grid-gap: 9px 5px;
+}
+
+[data-touch-ui] .xp-desktop-grid .cell {
+  min-height: 76px;
+  padding: 6px 4px;
+}
+
+[data-touch-ui] .xp-desktop-grid .cell img {
+  max-width: 42px;
+  max-height: 42px;
+}
+
+[data-touch-ui] .xp-luna-titlebar {
+  min-height: 44px;
+  touch-action: none;
+  align-items: center;
+}
+
+[data-touch-ui] .xp-luna-controls {
+  gap: 2px;
+}
+
+[data-touch-ui] .xp-luna-btn {
+  min-width: 40px;
+  min-height: 30px;
+}
+
+[data-touch-ui] .xp-taskbar-item {
+  min-height: 26px;
+}
+
+[data-touch-ui] .xp-start-btn {
+  min-height: 36px;
+  touch-action: manipulation;
 }

@@ -51,7 +51,7 @@ export function WindowShell({ w, isActive, children }: Props) {
         <button
           type="button"
           className="xp-luna-btn xp-luna-btn--maximize"
-          aria-label="Maximize"
+          aria-label={w.isMaximized ? "Restore" : "Maximize"}
           onClick={(e) => {
             e.stopPropagation();
             toggleMaximize(w.id);

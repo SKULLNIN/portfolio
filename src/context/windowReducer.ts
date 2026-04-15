@@ -1,5 +1,6 @@
 import { APP_REGISTRY } from "@/data/apps";
-import type { AppId, WindowAction, WindowState } from "@/types";
+import { computeInitialWindowFromViewport } from "@/lib/window-layout";
+import type { AppId, OpenViewportPayload, WindowAction, WindowState } from "@/types";
 
 export type WindowsRecord = Record<AppId, WindowState>;
 
@@ -9,16 +10,34 @@ function nextZIndex(windows: WindowsRecord): number {
   );
 }
 
-function createInitialWindow(id: AppId): WindowState {
+function createInitialWindow(
+  id: AppId,
+  viewport?: OpenViewportPayload
+): WindowState {
   const def = APP_REGISTRY[id];
-  return {
+  const base = {
     id,
     title: def.title,
     icon: def.icon,
     isOpen: true,
     isMinimized: false,
-    isMaximized: false,
     zIndex: 100,
+  } as const;
+
+  if (viewport) {
+    const geo = computeInitialWindowFromViewport(def, viewport);
+    return {
+      ...base,
+      isMaximized: geo.isMaximized,
+      position: geo.position,
+      size: geo.size,
+      preMaximize: geo.preMaximize,
+    };
+  }
+
+  return {
+    ...base,
+    isMaximized: false,
     position: { ...def.defaultPosition },
     size: { ...def.defaultSize },
     preMaximize: null,
@@ -44,19 +63,13 @@ export function windowReducer(
         };
       }
       if (existing && !existing.isOpen) {
+        const fresh = createInitialWindow(action.id, action.viewport);
         return {
           ...state,
-          [action.id]: {
-            ...existing,
-            isOpen: true,
-            isMinimized: false,
-            isMaximized: false,
-            preMaximize: null,
-            zIndex: z,
-          },
+          [action.id]: { ...fresh, zIndex: z },
         };
       }
-      const fresh = createInitialWindow(action.id);
+      const fresh = createInitialWindow(action.id, action.viewport);
       return {
         ...state,
         [action.id]: { ...fresh, zIndex: z },

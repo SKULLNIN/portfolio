@@ -3,15 +3,18 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { WindowProvider } from "@/context/WindowContext";
 import { TaskbarVisibilityProvider } from "@/context/TaskbarVisibilityContext";
+import { DeviceLayoutProvider, useDeviceLayout } from "@/context/DeviceLayoutContext";
 import { SystemSettingsProvider } from "@/context/SystemSettingsContext";
 import { useWindowManager } from "@/context/WindowContext";
 import { Desktop } from "@/components/Desktop/Desktop";
 import { Taskbar } from "@/components/Taskbar/Taskbar";
 import { TaskbarAutoHide } from "@/components/Taskbar/TaskbarAutoHide";
+import { TouchPointerOverlay } from "@/components/TouchPointerOverlay";
 import { XpBootSplash } from "@/components/XpBootSplash";
 
 function ShellInner() {
   const { openApp } = useWindowManager();
+  const { segment, isTouchUi } = useDeviceLayout();
   const [booted, setBooted] = useState(false);
   const openedIe = useRef(false);
 
@@ -28,14 +31,22 @@ function ShellInner() {
   return (
     <>
       {!booted && <XpBootSplash onDone={onBootDone} />}
-      <div className="relative flex h-dvh min-h-0 flex-col overflow-hidden">
+      <div
+        className="xp-shell relative box-border flex h-dvh min-h-0 min-w-0 flex-col overflow-hidden"
+        data-segment={segment}
+        {...(isTouchUi ? { "data-touch-ui": "" } : {})}
+        style={{
+          paddingTop: "env(safe-area-inset-top, 0px)",
+          paddingRight: "env(safe-area-inset-right, 0px)",
+          paddingBottom: "env(safe-area-inset-bottom, 0px)",
+          paddingLeft: "env(safe-area-inset-left, 0px)",
+        }}
+      >
         <Desktop />
         <TaskbarAutoHide>
           <Taskbar />
         </TaskbarAutoHide>
-        <p className="pointer-events-none fixed bottom-10 left-0 right-0 z-[50] mx-auto max-w-sm rounded border border-[#aca899] bg-[#fff9e6] px-3 py-2 text-center text-[11px] text-[#333] shadow md:hidden">
-          Best viewed on desktop — this XP UI is interactive on a large screen.
-        </p>
+        {isTouchUi ? <TouchPointerOverlay /> : null}
       </div>
     </>
   );
@@ -43,12 +54,14 @@ function ShellInner() {
 
 export function PortfolioClient() {
   return (
-    <WindowProvider>
+    <DeviceLayoutProvider>
       <TaskbarVisibilityProvider>
-        <SystemSettingsProvider>
-          <ShellInner />
-        </SystemSettingsProvider>
+        <WindowProvider>
+          <SystemSettingsProvider>
+            <ShellInner />
+          </SystemSettingsProvider>
+        </WindowProvider>
       </TaskbarVisibilityProvider>
-    </WindowProvider>
+    </DeviceLayoutProvider>
   );
 }

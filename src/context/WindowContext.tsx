@@ -12,6 +12,8 @@ import {
   createInitialWindowsState,
   windowReducer,
 } from "@/context/windowReducer";
+import { useTaskbarVisibility } from "@/context/TaskbarVisibilityContext";
+import { getVisualViewportSize } from "@/lib/viewport-profile";
 import type { AppId, WindowAction } from "@/types";
 import type { WindowsRecord } from "@/context/windowReducer";
 
@@ -30,15 +32,28 @@ type Ctx = {
 const WindowCtx = createContext<Ctx | null>(null);
 
 export function WindowProvider({ children }: { children: ReactNode }) {
+  const { taskbarInsetPx } = useTaskbarVisibility();
   const [windows, dispatch] = useReducer(
     windowReducer,
     undefined,
     createInitialWindowsState
   );
 
-  const openApp = useCallback((id: AppId) => {
-    dispatch({ type: "OPEN", id });
-  }, []);
+  const openApp = useCallback(
+    (id: AppId) => {
+      const vv = getVisualViewportSize();
+      dispatch({
+        type: "OPEN",
+        id,
+        viewport: {
+          width: vv.width,
+          height: vv.height,
+          taskbarInset: taskbarInsetPx,
+        },
+      });
+    },
+    [taskbarInsetPx]
+  );
 
   const closeApp = useCallback((id: AppId) => {
     dispatch({ type: "CLOSE", id });

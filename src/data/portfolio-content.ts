@@ -70,23 +70,11 @@ Perception   OpenCV · SLAM (Practical Deployments) · Detector Pipelines (e.g. 
 Build        CMake · colcon · Docker (Light) · Field Logging
 `;
 
-export const FILE_CERTS = `certifications.txt (template)
-────────────────────────────────────────
-• Add: drone pilot / workshop certificates, IIT event participations, online specializations
-• Replace lines below with your real entries.
+export const FILE_CERTS = `Coming soon.`;
 
-2025 — Your competition / program name (organizer)
-2024 — Course or bootcamp title (platform)
-`;
+export const FILE_PUBLICATIONS = `Coming soon.`;
 
-export const FILE_PUBLICATIONS = `publications.txt (template)
-────────────────────────────────────────
-• Add papers, posters, or tech reports when public.
-
-[Title] — [Venue / year] — [link or DOI]
-`;
-
-export type ProjectStatus = "Completed" | "In Progress";
+export type ProjectStatus = "Completed" | "In Progress" | "Upcoming";
 
 export type PortfolioProject = {
   id: string;
@@ -96,7 +84,21 @@ export type PortfolioProject = {
   stack: string[];
   description: string;
   githubUrl?: string;
+  /** Primary image in the detail pane */
   imageSrc?: string;
+  /** Lightbox title under thumbnail (defaults to project title) */
+  imageCaption?: string;
+  /** Extra thumbnails below the hero (e.g. CAD renders) */
+  galleryImages?: { src: string; caption?: string }[];
+  /** Shown as a dashed “+N” tile for additional media not listed yet */
+  moreImageCount?: number;
+  /** Optional clip in My Computer project detail (served from `public/`) */
+  videoSrc?: string;
+  videoTitle?: string;
+  /** Multiple clips (preferred when a project has more than one); overrides `videoSrc` / `videoTitle` when set */
+  videos?: { src: string; title: string }[];
+  /** Optional schedule / milestones (e.g. competition dates) */
+  timeline?: { when: string; label: string }[];
 };
 
 export const PROJECTS: PortfolioProject[] = [
@@ -109,18 +111,23 @@ export const PROJECTS: PortfolioProject[] = [
     description:
       "End-to-end autonomy experiments on a custom multirotor stack: flight modes, companion computer bridges, logging, and repeatable field tests. Emphasis on safe iteration and clean bring-up checklists.",
     githubUrl: OWNER.github,
-    imageSrc: "/wallpapers/bliss.jpg",
+    imageSrc: "/media/p1sun/cad-top-view.png",
+    galleryImages: [
+      { src: "/media/p1sun/cad-shell-detail.png", caption: "Shell, sensor module & battery bay" },
+    ],
+    moreImageCount: 1,
   },
   {
     id: "crowdsense",
     title: "CrowdSense — AI Crowd Monitoring",
-    short: "Edge CV + Telemetry Hooks",
-    status: "Completed",
+    short: "Edge CV + telemetry — upcoming build",
+    status: "Upcoming",
     stack: ["Python", "OpenCV", "YOLO-Class Detectors", "Jetson"],
     description:
-      "A prototype analytics pipeline for crowd dynamics: detection tracks, simple counting, and export hooks for downstream autonomy or logging dashboards (demo and research oriented).",
-    githubUrl: OWNER.github,
-    imageSrc: "/wallpapers/bliss.jpg",
+      "Upcoming build — a prototype analytics pipeline for crowd dynamics: detection tracks, simple counting, and export hooks for downstream autonomy or logging dashboards (demo and research oriented).",
+    githubUrl: "https://github.com/SKULLNIN/GNNS_drone-updated2",
+    imageSrc: "/media/placeholders/crowdsense-coming-soon.svg",
+    imageCaption: "CrowdSense — preview coming soon",
   },
   {
     id: "s500",
@@ -130,18 +137,51 @@ export const PROJECTS: PortfolioProject[] = [
     stack: ["PX4", "QGroundControl", "Bench + Field Tuning"],
     description:
       "Hands-on build of an S500-class quad: assembly, ESC calibration, vibration checks, PID tuning, and incremental flight envelopes until stable hover and light waypoint tests.",
-    imageSrc: "/wallpapers/bliss.jpg",
+    imageSrc: "/media/s500/s500-bench-top-down.png",
+    imageCaption: "S500 — bench build (Cube Orange+, frame & wiring)",
+    galleryImages: [
+      {
+        src: "/media/s500/s500-rig-realsense.png",
+        caption: "S500 — depth camera rig & landing gear",
+      },
+      {
+        src: "/media/s500/s500-jetson-enclosure.png",
+        caption: "Companion computer — Jetson (custom enclosure)",
+      },
+    ],
+    videos: [
+      {
+        src: "/media/s500/VID20260323164644.mp4",
+        title: "S500 — build & bench clip (Mar 2026)",
+      },
+    ],
   },
   {
     id: "ops2",
     title: "OPS 2 — IIT Jodhpur Entry",
-    short: "Competition Integration Sprint",
+    short: "IIT Jodhpur OPS-2 · Autonomy & demo flight",
     status: "In Progress",
     stack: ["ROS 2", "Python", "Integration", "Demo Flight"],
     description:
-      "Time-boxed competition entry at IIT Jodhpur: integrate perception and autonomy demos, document failure modes, and present a credible live or recorded flight segment for judges.",
-    githubUrl: OWNER.github,
-    imageSrc: "/wallpapers/bliss.jpg",
+      "For our OPS-2 entry at IIT Jodhpur, we are building a time-boxed autonomous UAV demo that combines perception, decision-making, and a credible live or recorded flight showcase for the judges. The focus is on demonstrating reliable autonomy while clearly documenting failure modes and system limitations as part of a competition built around real UAV mission performance.",
+    timeline: [
+      {
+        when: "16 May 2026",
+        label: "OPS-2 competition — IIT Jodhpur (live / recorded flight showcase)",
+      },
+    ],
+    githubUrl: "https://github.com/SKULLNIN/GNNS_drone-updated2",
+    imageSrc: "/media/competition/ops2-lab-bench-cube-quad.png",
+    videos: [
+      {
+        src: "/media/competition/ops2-iit-jodhpur-2026-04-15.mp4",
+        title: "IIT Jodhpur — bench & integration clip",
+      },
+      {
+        src: "/media/competition/ops2-jetson-mapping-orin.mp4",
+        title: "Live 3D mapping / odometry — Jetson Orin Nano",
+      },
+    ],
   },
 ];
 
@@ -152,9 +192,32 @@ export const RECYCLE_ITEMS: { name: string; blurb: string }[] = [
 ];
 
 export const PICTURE_CAPTIONS: { src: string; caption: string }[] = [
-  { src: "/wallpapers/bliss.jpg", caption: "Field day — bring-up & sunshine (placeholder)" },
-  { src: "/wallpapers/bliss.jpg", caption: "CAD / frame iteration (reuse your drone photos)" },
-  { src: "/wallpapers/bliss.jpg", caption: "Competition / team photo — swap for real shots" },
+  { src: "/media/drone/me-and-drone.png", caption: "Lab — quad build & workshop" },
+  {
+    src: "/media/s500/s500-bench-top-down.png",
+    caption: "S500 — bench build (Cube Orange+, frame & wiring)",
+  },
+  {
+    src: "/media/s500/s500-rig-realsense.png",
+    caption: "S500 — depth camera rig & landing gear",
+  },
+  {
+    src: "/media/s500/s500-jetson-enclosure.png",
+    caption: "S500 — Jetson companion (custom enclosure)",
+  },
+  {
+    src: "/media/competition/ops2-lab-bench-cube-quad.png",
+    caption: "IIT Jodhpur — competition quad on the bench (Cube stack)",
+  },
+];
+
+/** Short clips in My Pictures — served from `public/media/videos/` (native HTML5 player). */
+export const PICTURE_VIDEOS: { src: string; title: string; caption?: string }[] = [
+  {
+    src: "/media/videos/workshop-showcase-2026-04-15.mp4",
+    title: "Workshop — bench & quad",
+    caption: "April 2026 · lab clip",
+  },
 ];
 
 export const BSOD_MESSAGE = `

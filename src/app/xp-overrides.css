@@ -3585,3 +3585,90 @@ a.ie-go-open-primary:active {
   min-height: 36px;
   touch-action: manipulation;
 }
+
+/* ----- Display Properties (desktop right-click → Properties) ----- */
+.xp-dp-titlebtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 21px;
+  height: 21px;
+  padding: 0 5px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 2px;
+  background: linear-gradient(180deg, #4a8fd8 0%, #1a5aa8 100%);
+  font-family: Tahoma, "Segoe UI", sans-serif;
+  font-size: 12px;
+  font-weight: bold;
+  color: #fff;
+  cursor: default;
+  line-height: 1;
+}
+
+.xp-dp-titlebtn--close {
+  font-size: 16px;
+  padding-bottom: 1px;
+}
+
+.xp-dp-tab {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 4px 2px 5px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 3px 3px 0 0;
+  background: transparent;
+  font-family: Tahoma, "Segoe UI", sans-serif;
+  font-size: 11px;
+  color: #333;
+  cursor: default;
+}
+
+.xp-dp-tab:hover {
+  border-color: #aca899;
+  background: linear-gradient(180deg, #faf8f5 0%, #ece9d8 100%);
+}
+
+.xp-dp-tab--active {
+  position: relative;
+  z-index: 1;
+  margin-bottom: -1px;
+  padding-bottom: 6px;
+  border-color: #aca899;
+  background: #fff;
+  font-weight: bold;
+  color: #000;
+}
+
+.xp-dp-mini-btn {
+  padding: 2px 8px;
+  font-family: Tahoma, "Segoe UI", sans-serif;
+  font-size: 11px;
+  border: 1px solid #aca899;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #fff 0%, #ece9d8 100%);
+  cursor: default;
+}
+
+.xp-dp-mini-btn:disabled {
+  opacity: 0.45;
+}
+
+.xp-dp-footer-btn {
+  min-width: 72px;
+  padding: 3px 12px;
+  font-family: Tahoma, "Segoe UI", sans-serif;
+  font-size: 11px;
+  border: 1px solid #003c74;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #fff 0%, #ece9d8 100%);
+  cursor: default;
+}
+
+.xp-dp-footer-btn:disabled {
+  opacity: 0.45;
+}
+
+.xp-dp-sample-win {
+  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.25);
+}

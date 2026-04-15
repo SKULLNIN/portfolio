@@ -34,7 +34,9 @@ export function XpMessageBox({
           <div className="xp-msg-icon h-8 w-8 shrink-0 bg-[#ffcc00] text-center text-[20px] leading-8">
             !
           </div>
-          <p className="m-0 flex-1 text-[12px] leading-snug text-black">{message}</p>
+          <p className="m-0 flex-1 whitespace-pre-line text-[12px] leading-snug text-black">
+            {message}
+          </p>
         </div>
         <div className="flex justify-center border-t border-[#d4d0c8] bg-[#ece9d8] px-4 py-3">
           <button

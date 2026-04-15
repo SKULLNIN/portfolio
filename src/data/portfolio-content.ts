@@ -9,7 +9,7 @@ export const OWNER = {
   github: "https://github.com/SKULLNIN",
   linkedin: "https://www.linkedin.com/in/laxmesh-ankola-12bb03252/",
   /** Served from `public/` — rename the file here if you replace it */
-  resumePdf: "/Laxmeesh_Ankola_Resume.docx.pdf",
+  resumePdf: "/Laxmeesh-Ankola-Resume.pdf",
 } as const;
 
 export const BIO_HTML = `

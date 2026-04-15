@@ -51,7 +51,9 @@ export type WindowAction =
       size: { width: number; height: number };
       position: { x: number; y: number };
     }
-  | { type: "TOGGLE_MINIMIZE_FROM_TASKBAR"; id: AppId };
+  | { type: "TOGGLE_MINIMIZE_FROM_TASKBAR"; id: AppId }
+  /** Close all apps and reset window state (e.g. after fake shutdown → login). */
+  | { type: "RESET_ALL" };
 
 export interface AppDefinition {
   id: AppId;

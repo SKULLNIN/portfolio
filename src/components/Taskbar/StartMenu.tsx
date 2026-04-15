@@ -12,6 +12,8 @@ import type { AppId } from "@/types";
 type Props = {
   open: boolean;
   onClose: () => void;
+  /** After Start → Turn Off blackout — return to login (welcome) screen. */
+  onShutdownTurnOffComplete?: () => void;
 };
 
 /** Left column: all apps except IE (IE is pinned at top). */
@@ -21,7 +23,7 @@ const LEFT_COLUMN_APPS = APP_ORDER.filter((id) => id !== "internet-explorer");
  * Windows XP Pro–style Start menu: orange header band, two columns (programs | system),
  * green "All Programs" strip, dark footer.
  */
-export function StartMenu({ open, onClose }: Props) {
+export function StartMenu({ open, onClose, onShutdownTurnOffComplete }: Props) {
   const { openApp } = useWindowManager();
   const ref = useRef<HTMLDivElement>(null);
   const [showShutdown, setShowShutdown] = useState(false);
@@ -48,6 +50,7 @@ export function StartMenu({ open, onClose }: Props) {
       <ShutdownDialog
         open={showShutdown}
         onClose={() => setShowShutdown(false)}
+        onAfterTurnOff={onShutdownTurnOffComplete}
       />
       <LogoffDialog
         open={showLogoff}

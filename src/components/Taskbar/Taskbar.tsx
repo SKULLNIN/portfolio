@@ -9,7 +9,11 @@ import { TaskbarTab } from "@/components/Taskbar/TaskbarTab";
 import { SystemTray } from "@/components/Taskbar/SystemTray";
 import type { AppId } from "@/types";
 
-export function Taskbar() {
+type TaskbarProps = {
+  onShutdownTurnOffComplete?: () => void;
+};
+
+export function Taskbar({ onShutdownTurnOffComplete }: TaskbarProps) {
   const { windows } = useWindowManager();
   const [startOpen, setStartOpen] = useState(false);
 
@@ -27,7 +31,11 @@ export function Taskbar() {
 
   return (
     <div className="xp-taskbar relative">
-      <StartMenu open={startOpen} onClose={() => setStartOpen(false)} />
+      <StartMenu
+        open={startOpen}
+        onClose={() => setStartOpen(false)}
+        onShutdownTurnOffComplete={onShutdownTurnOffComplete}
+      />
       <StartButton
         open={startOpen}
         onToggle={() => setStartOpen((v) => !v)}

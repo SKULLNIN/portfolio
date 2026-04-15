@@ -1,7 +1,11 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { WELCOME_SCREEN_Z_INDEX } from "@/lib/constants";
+import {
+  SHUTDOWN_FADE_MS,
+  SHUTDOWN_RESTORE_DELAY_MS,
+  WELCOME_SCREEN_Z_INDEX,
+} from "@/lib/constants";
 import { requestAppFullscreen } from "@/lib/fullscreen";
 import {
   playWindowsXpShutdownSound,
@@ -10,6 +14,8 @@ import {
 
 type Props = {
   onLogin: () => void;
+  /** After welcome “Turn off computer” blackout — replay boot (quick refresh). */
+  onTurnOffBlackoutComplete?: () => void;
 };
 
 /**
@@ -20,7 +26,10 @@ type Props = {
  *   - Bottom-left: "Turn off computer"
  *   - Bottom-right: Hint text about user accounts
  */
-export function XpWelcomeScreen({ onLogin }: Props) {
+export function XpWelcomeScreen({
+  onLogin,
+  onTurnOffBlackoutComplete,
+}: Props) {
   const [phase, setPhase] = useState<"welcome" | "logging-in">("welcome");
 
   const handleGuestClick = useCallback(() => {
@@ -99,12 +108,13 @@ export function XpWelcomeScreen({ onLogin }: Props) {
           className="xp-welcome-turnoff"
           onClick={() => {
             playWindowsXpShutdownSound();
-            document.body.style.transition = "opacity 1.5s ease";
+            document.body.style.transition = `opacity ${SHUTDOWN_FADE_MS}ms ease`;
             document.body.style.opacity = "0";
             setTimeout(() => {
+              onTurnOffBlackoutComplete?.();
               document.body.style.opacity = "1";
               document.body.style.transition = "";
-            }, 2000);
+            }, SHUTDOWN_RESTORE_DELAY_MS);
           }}
         >
           <span className="xp-welcome-turnoff-icon">

@@ -13,6 +13,7 @@ import { XpBootSplash } from "@/components/XpBootSplash";
 import { FullscreenPrompt } from "@/components/FullscreenPrompt";
 import { XpWelcomeScreen } from "@/components/XpWelcomeScreen";
 import { TASKBAR_HEIGHT_PX, TASKBAR_SHELL_Z_INDEX } from "@/lib/constants";
+import { exitAppFullscreen } from "@/lib/fullscreen";
 
 /**
  * Boot phases:
@@ -23,7 +24,7 @@ import { TASKBAR_HEIGHT_PX, TASKBAR_SHELL_Z_INDEX } from "@/lib/constants";
 type BootPhase = "boot" | "welcome" | "desktop";
 
 function ShellInner() {
-  const { openApp } = useWindowManager();
+  const { openApp, dispatch } = useWindowManager();
   const { segment, isTouchUi } = useDeviceLayout();
   const [phase, setPhase] = useState<BootPhase>("boot");
   const openedIe = useRef(false);
@@ -35,6 +36,14 @@ function ShellInner() {
   const onLoginDone = useCallback(() => {
     setPhase("desktop");
   }, []);
+
+  /** After Start → Turn Off: clear apps, exit fullscreen, show login (welcome) again. */
+  const onShutdownTurnOffComplete = useCallback(() => {
+    void exitAppFullscreen().catch(() => {});
+    dispatch({ type: "RESET_ALL" });
+    openedIe.current = false;
+    setPhase("welcome");
+  }, [dispatch]);
 
   /** Reset document scroll after boot / viewport changes (mobile URL bar, rotation). */
   useEffect(() => {
@@ -68,7 +77,12 @@ function ShellInner() {
     <>
       <FullscreenPrompt phase={phase} />
       {phase === "boot" && <XpBootSplash onDone={onBootDone} />}
-      {phase === "welcome" && <XpWelcomeScreen onLogin={onLoginDone} />}
+      {phase === "welcome" && (
+        <XpWelcomeScreen
+          onLogin={onLoginDone}
+          onTurnOffBlackoutComplete={() => setPhase("boot")}
+        />
+      )}
       <div
         className="xp-shell relative box-border flex h-dvh w-full min-h-0 min-w-0 max-w-[100vw] flex-col overflow-x-hidden overflow-y-hidden"
         data-segment={segment}
@@ -90,7 +104,7 @@ function ShellInner() {
             className="pointer-events-auto fixed bottom-[-1px] left-0 right-0 overflow-visible"
             style={{ zIndex: TASKBAR_SHELL_Z_INDEX }}
           >
-            <Taskbar />
+            <Taskbar onShutdownTurnOffComplete={onShutdownTurnOffComplete} />
           </div>
         ) : null}
         {isTouchUi && booted ? <TouchPointerOverlay /> : null}

@@ -1,12 +1,18 @@
 "use client";
 
 import { createPortal } from "react-dom";
+import {
+  SHUTDOWN_FADE_MS,
+  SHUTDOWN_RESTORE_DELAY_MS,
+} from "@/lib/constants";
 import { playWindowsXpShutdownSound } from "@/lib/xp-shutdown-sound";
 import { XP_ICONS } from "@/lib/xp-icons";
 
 type Props = {
   open: boolean;
   onClose: () => void;
+  /** After fade-out + blackout, before restoring opacity — e.g. return to login screen. */
+  onAfterTurnOff?: () => void;
 };
 
 /**
@@ -14,7 +20,7 @@ type Props = {
  * Stand By | Turn Off | Restart
  * Matching the real XP shutdown dialog with the green/red/yellow buttons.
  */
-export function ShutdownDialog({ open, onClose }: Props) {
+export function ShutdownDialog({ open, onClose, onAfterTurnOff }: Props) {
   if (!open || typeof document === "undefined") return null;
 
   return createPortal(
@@ -53,13 +59,14 @@ export function ShutdownDialog({ open, onClose }: Props) {
               className="xp-shutdown-btn xp-shutdown-btn--turnoff"
               onClick={() => {
                 playWindowsXpShutdownSound();
-                document.body.style.transition = "opacity 1.5s ease";
+                document.body.style.transition = `opacity ${SHUTDOWN_FADE_MS}ms ease`;
                 document.body.style.opacity = "0";
                 setTimeout(() => {
+                  onAfterTurnOff?.();
                   document.body.style.opacity = "1";
                   document.body.style.transition = "";
                   onClose();
-                }, 2000);
+                }, SHUTDOWN_RESTORE_DELAY_MS);
               }}
               title="Turn Off"
             >

@@ -185,6 +185,8 @@ export function windowReducer(
         [action.id]: { ...w, isMinimized: true },
       };
     }
+    case "RESET_ALL":
+      return createInitialWindowsState();
     default:
       return state;
   }

@@ -1,6 +1,15 @@
 /** Height of bottom taskbar in px — Windows XP Luna default (~30px @ 96 DPI). */
 export const TASKBAR_HEIGHT_PX = 30;
 
+/** Fade duration for fake shutdown (body opacity → 0). */
+export const SHUTDOWN_FADE_MS = 1500;
+
+/** Time the screen stays fully black after fade-out before restoring (Turn Off / welcome). */
+export const SHUTDOWN_BLACKOUT_MS = 5000;
+
+/** `setTimeout` delay: wait for fade-out to finish, then hold blackout {@link SHUTDOWN_BLACKOUT_MS}. */
+export const SHUTDOWN_RESTORE_DELAY_MS = SHUTDOWN_FADE_MS + SHUTDOWN_BLACKOUT_MS;
+
 /**
  * Fixed stacking for the taskbar shell — must stay above every app window
  * ({@link WINDOW_Z_INDEX_CAP}).

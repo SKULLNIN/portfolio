@@ -23,6 +23,10 @@ const TRACKS: { title: string; src: string }[] = [
     title: "sucks",
     src: "/music/whatsapp-2026-04-15-082431.mpeg",
   },
+  {
+    title: "But",
+    src: "/music/stranger-in-the-night.mpeg",
+  },
 ];
 
 export function MediaPlayer() {

@@ -152,6 +152,14 @@ export function MyComputer() {
     });
   }, []);
 
+  const openResumePdf = useCallback(() => {
+    const href =
+      typeof window !== "undefined"
+        ? new URL(OWNER.resumePdf, window.location.origin).href
+        : OWNER.resumePdf;
+    window.open(href, "_blank", "noopener,noreferrer");
+  }, []);
+
   const backHistory = useMemo(() => {
     const out: { label: string; onSelect: () => void }[] = [];
     for (let i = nav.index - 1; i >= 0; i--) {
@@ -278,6 +286,17 @@ export function MyComputer() {
                   Change a setting
                 </button>
               </li>
+              {loc === "resume" && (
+                <li>
+                  <button
+                    type="button"
+                    className="xp-mc-link"
+                    onClick={openResumePdf}
+                  >
+                    Resume PDF
+                  </button>
+                </li>
+              )}
             </ul>
           </Accordion>
           <Accordion
@@ -354,8 +373,9 @@ export function MyComputer() {
                 {loc === "portfolio" &&
                   "Portfolio folder with projects and text files."}
                 {loc === "projects" && "Project folders with detail panes."}
-                {(loc === "resume" || loc === "contact" || loc === "skills") &&
-                  "Text document."}
+                {loc === "resume" &&
+                  "Text document. Use Resume PDF for the full résumé file."}
+                {(loc === "contact" || loc === "skills") && "Text document."}
               </p>
             )}
           </Accordion>
@@ -397,9 +417,23 @@ export function MyComputer() {
               <ViewProjects viewMode={viewMode} searchQuery={searchQuery} />
             )}
             {loc === "resume" && (
-              <pre className="m-0 whitespace-pre-wrap font-mono text-[12px] leading-relaxed">
-                {FILE_RESUME}
-              </pre>
+              <div className="flex min-h-0 flex-col gap-3 sm:flex-row sm:items-start">
+                <pre className="m-0 min-w-0 flex-1 whitespace-pre-wrap font-mono text-[12px] leading-relaxed">
+                  {FILE_RESUME}
+                </pre>
+                <div className="flex shrink-0 flex-col gap-1 border-[#d4d0c8] sm:border-l sm:pl-4">
+                  <span className="text-[10px] font-bold uppercase tracking-wide text-[#666]">
+                    File tasks
+                  </span>
+                  <button
+                    type="button"
+                    className="rounded border border-[#003c74] bg-gradient-to-b from-white to-[#ece9d8] px-3 py-1.5 text-left text-[11px] text-black shadow-sm hover:border-[#0a246a]"
+                    onClick={openResumePdf}
+                  >
+                    Resume PDF
+                  </button>
+                </div>
+              </div>
             )}
             {loc === "contact" && (
               <pre className="m-0 whitespace-pre-wrap font-mono text-[12px] leading-relaxed">

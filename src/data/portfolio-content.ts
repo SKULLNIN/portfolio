@@ -4,7 +4,7 @@
 export const OWNER = {
   displayName: "Laxmesh Ankola",
   title: "Robotics & Autonomous Systems",
-  college: "Dr. D.Y. Patil Institute of Technology (affiliated with NMAMIT / VTU ecosystem)",
+  college: "Dr. D.Y. Patil Institute of Technology",
   email: "laxmeshankola@gmail.com",
   github: "https://github.com/SKULLNIN",
   linkedin: "https://www.linkedin.com/in/laxmesh-ankola-12bb03252/",

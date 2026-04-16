@@ -65,6 +65,23 @@ export function Winamp({ isOpen, isMinimized, zIndex }: Props) {
     return () => window.removeEventListener("xp-mute-change", onTrayMute);
   }, []);
 
+  /** Pinball used to suspend Web Audio globally; nudge Webamp after Pinball fully closes (Brave/Chromium). */
+  useEffect(() => {
+    const onPinballClosed = () => {
+      const inst = instanceRef.current;
+      if (!inst) return;
+      try {
+        const v = inst.store.getState().media.volume;
+        inst.setVolume(0);
+        inst.setVolume(v);
+      } catch {
+        /* ignore */
+      }
+    };
+    window.addEventListener("xp-pinball-closed", onPinballClosed);
+    return () => window.removeEventListener("xp-pinball-closed", onPinballClosed);
+  }, []);
+
   useEffect(() => {
     if (!isOpen) return;
     const host = hostRef.current;

@@ -13,9 +13,9 @@
  *
  * Audio teardown: Emscripten SDL creates an {@link AudioContext} that keeps playing after
  * the React wrapper unmounts. We patch `window.AudioContext` once and record a **small,
- * bounded** set of contexts created while Pinball boots so we can suspend/resume **only
- * those** when the window is closed — never other apps' Web Audio (e.g. Winamp). We also
- * toggle the Emscripten main loop so the game stops burning CPU while hidden.
+ * bounded** set of contexts created **only right after WASM runtime init** so Winamp is
+ * never captured during the long script load. We silence Pinball with master gain + pause
+ * the main loop (no `AudioContext.suspend()` — that can break Brave/Chromium for other apps).
  */
 
 import {
@@ -189,20 +189,15 @@ function ensurePinballAudioCapture(): void {
 }
 
 /**
- * Close / minimize / in-game "cancel": silence immediately (master gain = 0, synchronous),
- * then try to `suspend()` each AudioContext and pause the Emscripten main loop. The gain is
- * the important part — `suspend()` is async and some browsers ignore it for short windows.
+ * Close / minimize / in-game "cancel": silence immediately (master gain = 0, synchronous)
+ * and pause the Emscripten main loop. We intentionally **do not** call `AudioContext.suspend()`:
+ * Chromium/Brave can leave the tab's Web Audio in a bad state where other apps (e.g. Winamp)
+ * stay silent until a full reload.
  */
 function suspendPinball(): void {
   if (typeof window === "undefined") return;
   pinballForceSilent = true;
   applyPinballMasterGains();
-  /** Suspend every captured context — `running` check alone misses edge states in some browsers. */
-  for (const ctx of pinballEngineAudioCtxs) {
-    void ctx.suspend().catch(() => {
-      /* context may already be closing */
-    });
-  }
   const mod = (window as unknown as { Module?: EmscriptenStatic }).Module;
   try {
     mod?.pauseMainLoop?.();
@@ -274,7 +269,8 @@ export function Pinball({ isOpen, isMinimized, zIndex, isActive }: Props) {
       __pinballCaptureAudio?: boolean;
       Module?: EmscriptenStatic;
     };
-    w.__pinballCaptureAudio = true;
+    /** Do not capture during script/WASM download — only after runtime init (see below). */
+    w.__pinballCaptureAudio = false;
 
     let captureOffTimer: number | undefined;
 
@@ -290,10 +286,12 @@ export function Pinball({ isOpen, isMinimized, zIndex, isActive }: Props) {
       onRuntimeInitialized() {
         setLoadingText("Starting game…");
         setTimeout(() => setShowOverlay(false), 600);
-        /** Short window: long capture lets Winamp (or other apps) get recorded here and then stay suspended forever. */
+        /** SDL audio is created right after init; keep capture tight so Winamp is never listed here. */
+        if (captureOffTimer !== undefined) window.clearTimeout(captureOffTimer);
+        w.__pinballCaptureAudio = true;
         captureOffTimer = window.setTimeout(() => {
           w.__pinballCaptureAudio = false;
-        }, 20_000);
+        }, 12_000);
       },
       setStatus(text) {
         if (text) setLoadingText(text);
@@ -324,6 +322,11 @@ export function Pinball({ isOpen, isMinimized, zIndex, isActive }: Props) {
     if (!scriptInjected.current) return;
     if (!isOpen || isMinimized) {
       suspendPinball();
+      if (!isOpen) {
+        queueMicrotask(() => {
+          window.dispatchEvent(new CustomEvent("xp-pinball-closed"));
+        });
+      }
     } else {
       resumePinball();
     }

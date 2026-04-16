@@ -72,13 +72,22 @@ function clamp01(n: number) {
 
 /** Current master level for Pinball (0–1); updated from system volume + tray mute. */
 let pinballMasterLevel = 1;
+/** When true, every Pinball context is pinned to gain 0 regardless of system volume. */
+let pinballForceSilent = false;
 
+/** Effective gain = 0 if closed/minimized, else master level; use `cancelAndHoldAtTime`-like update. */
 function applyPinballMasterGains() {
-  const v = clamp01(pinballMasterLevel);
+  const v = pinballForceSilent ? 0 : clamp01(pinballMasterLevel);
   for (const ctx of capturedAudioCtxs) {
     if (ctx.state === "closed") continue;
     const g = pinballMasterGainByContext.get(ctx);
-    if (g) g.gain.value = v;
+    if (!g) continue;
+    try {
+      g.gain.cancelScheduledValues(ctx.currentTime);
+    } catch {
+      /* not all implementations expose this — fall back to setter */
+    }
+    g.gain.value = v;
   }
 }
 
@@ -98,7 +107,8 @@ function ensurePinballDestinationGainPatch(): void {
     let g = pinballMasterGainByContext.get(ctx);
     if (!g && ctx.state !== "closed") {
       g = ctx.createGain();
-      g.gain.value = clamp01(pinballMasterLevel);
+      /** Starts silent if Pinball is currently closed — prevents blips from late-created nodes. */
+      g.gain.value = pinballForceSilent ? 0 : clamp01(pinballMasterLevel);
       pinballMasterGainByContext.set(ctx, g);
       pinballMasterGainNodes.add(g);
       g.connect(ctx.destination);
@@ -170,8 +180,15 @@ function ensurePinballAudioCapture(): void {
   audioCtxPatched = true;
 }
 
+/**
+ * Close / minimize / in-game "cancel": silence immediately (master gain = 0, synchronous),
+ * then try to `suspend()` each AudioContext and pause the Emscripten main loop. The gain is
+ * the important part — `suspend()` is async and some browsers ignore it for short windows.
+ */
 function suspendPinball(): void {
   if (typeof window === "undefined") return;
+  pinballForceSilent = true;
+  applyPinballMasterGains();
   /** Suspend every captured context — `running` check alone misses edge states in some browsers. */
   for (const ctx of capturedAudioCtxs) {
     void ctx.suspend().catch(() => {
@@ -188,8 +205,10 @@ function suspendPinball(): void {
 
 function resumePinball(): void {
   if (typeof window === "undefined") return;
+  pinballForceSilent = false;
+  applyPinballMasterGains();
   for (const ctx of capturedAudioCtxs) {
-    if (ctx.state === "suspended") {
+    if (ctx.state !== "running") {
       ctx.resume().catch(() => {
         /* ignore — requires user gesture on some browsers */
       });
@@ -407,6 +426,8 @@ export function Pinball({ isOpen, isMinimized, zIndex, isActive }: Props) {
               aria-label="Minimize"
               onClick={(e) => {
                 e.stopPropagation();
+                /** Silence + pause before React re-renders — no audio gap while state updates. */
+                suspendPinball();
                 minimizeApp("pinball");
               }}
             />
@@ -416,6 +437,7 @@ export function Pinball({ isOpen, isMinimized, zIndex, isActive }: Props) {
               aria-label="Close"
               onClick={(e) => {
                 e.stopPropagation();
+                suspendPinball();
                 closeApp("pinball");
               }}
             />

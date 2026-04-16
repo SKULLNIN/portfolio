@@ -52,14 +52,29 @@ export const CP_PROGRAMS = PROJECTS.map((p) => ({
 }));
 
 /**
- * Windows XP Luna–style wallpaper names (search: “Windows XP Bliss”, “XP Azul wallpaper”, etc.).
- * Assets live in `public/wallpapers/` (PNG from your Reddit / full-res pack + a few JPG placeholders).
+ * Windows XP–style desktop backgrounds. First four are classic-style photos (Bliss, Stonehenge,
+ * Tulips, lunar); assets live in `public/wallpapers/`.
  */
 export const CP_WALLPAPERS = [
   {
     name: "Bliss",
     css: "linear-gradient(175deg,#4870B8 0%,#84B8EC 50%,#C4EAF8 100%)",
     imageUrl: "/wallpapers/bliss.png",
+  },
+  {
+    name: "Stonehenge",
+    css: "linear-gradient(160deg,#87ceeb 0%,#4682b4 50%,#1e90ff 100%)",
+    imageUrl: "/wallpapers/stonehenge.png",
+  },
+  {
+    name: "Tulips",
+    css: "linear-gradient(180deg,#1e5799 0%,#ffd700 45%,#fffacd 100%)",
+    imageUrl: "/wallpapers/tulips.png",
+  },
+  {
+    name: "Lunar",
+    css: "linear-gradient(180deg,#0a0a12 0%,#2a2a32 50%,#4a4a52 100%)",
+    imageUrl: "/wallpapers/lunar.png",
   },
   {
     name: "Autumn",
@@ -100,11 +115,6 @@ export const CP_WALLPAPERS = [
     name: "Serenity",
     css: "linear-gradient(180deg,#0a1628 0%,#1a3a58 50%,#2a5a88 100%)",
     imageUrl: "/wallpapers/serenity.png",
-  },
-  {
-    name: "Stonehenge",
-    css: "linear-gradient(160deg,#2a3a1a 0%,#4a6a2a 50%,#6a9a4a 100%)",
-    imageUrl: "/wallpapers/stonehenge.jpg",
   },
   {
     name: "Vortec Space",

@@ -12,10 +12,10 @@
  * canvas mounted for the page's lifetime and just show/hide the Rnd.
  *
  * Audio teardown: Emscripten SDL creates an {@link AudioContext} that keeps playing after
- * the React wrapper unmounts. We patch `window.AudioContext` once and capture any contexts
- * created during Pinball's engine init, so we can {@link AudioContext.suspend}/`resume`
- * them when the window is closed / minimized / restored. We also toggle the Emscripten
- * main loop so the game stops burning CPU while hidden.
+ * the React wrapper unmounts. We patch `window.AudioContext` once and record a **small,
+ * bounded** set of contexts created while Pinball boots so we can suspend/resume **only
+ * those** when the window is closed — never other apps' Web Audio (e.g. Winamp). We also
+ * toggle the Emscripten main loop so the game stops burning CPU while hidden.
  */
 
 import {
@@ -54,9 +54,14 @@ type EmscriptenStatic = {
   resumeMainLoop?: () => void;
 };
 
-/** Module-scoped so the AudioContext capture persists across React re-renders. */
-const capturedAudioCtxs: AudioContext[] = [];
-/** Contexts created while Pinball capture is on — used for routing + master gain. */
+/**
+ * AudioContexts created by the Pinball WASM build **only** (never Winamp / other apps).
+ * We cap how many we attach so a stray `new AudioContext()` during the short capture window
+ * cannot steal the rest of the site's audio after Pinball closes.
+ */
+const pinballEngineAudioCtxs: AudioContext[] = [];
+const MAX_PINBALL_ENGINE_AUDIO_CONTEXTS = 3;
+/** Same refs as {@link pinballEngineAudioCtxs} — used by the `connect`→master-gain patch. */
 const pinballAudioContexts = new Set<BaseAudioContext>();
 let audioCtxPatched = false;
 let connectPatched = false;
@@ -78,7 +83,7 @@ let pinballForceSilent = false;
 /** Effective gain = 0 if closed/minimized, else master level; use `cancelAndHoldAtTime`-like update. */
 function applyPinballMasterGains() {
   const v = pinballForceSilent ? 0 : clamp01(pinballMasterLevel);
-  for (const ctx of capturedAudioCtxs) {
+  for (const ctx of pinballEngineAudioCtxs) {
     if (ctx.state === "closed") continue;
     const g = pinballMasterGainByContext.get(ctx);
     if (!g) continue;
@@ -139,8 +144,8 @@ function ensurePinballDestinationGainPatch(): void {
 
 /**
  * Install a one-time `AudioContext` wrapper that records new instances into
- * {@link capturedAudioCtxs} *only* while `window.__pinballCaptureAudio` is true — so we
- * don't accidentally capture Webamp's audio contexts. Safe to call repeatedly.
+ * {@link pinballEngineAudioCtxs} *only* while `window.__pinballCaptureAudio` is true — and
+ * only up to {@link MAX_PINBALL_ENGINE_AUDIO_CONTEXTS} so unrelated apps are not captured.
  */
 function ensurePinballAudioCapture(): void {
   if (typeof window === "undefined" || audioCtxPatched) return;
@@ -166,8 +171,11 @@ function ensurePinballAudioCapture(): void {
     opts?: AudioContextOptions,
   ): AudioContext {
     const inst = new Orig(opts);
-    if (w.__pinballCaptureAudio) {
-      capturedAudioCtxs.push(inst);
+    if (
+      w.__pinballCaptureAudio &&
+      pinballEngineAudioCtxs.length < MAX_PINBALL_ENGINE_AUDIO_CONTEXTS
+    ) {
+      pinballEngineAudioCtxs.push(inst);
       pinballAudioContexts.add(inst);
     }
     return inst;
@@ -190,7 +198,7 @@ function suspendPinball(): void {
   pinballForceSilent = true;
   applyPinballMasterGains();
   /** Suspend every captured context — `running` check alone misses edge states in some browsers. */
-  for (const ctx of capturedAudioCtxs) {
+  for (const ctx of pinballEngineAudioCtxs) {
     void ctx.suspend().catch(() => {
       /* context may already be closing */
     });
@@ -207,7 +215,7 @@ function resumePinball(): void {
   if (typeof window === "undefined") return;
   pinballForceSilent = false;
   applyPinballMasterGains();
-  for (const ctx of capturedAudioCtxs) {
+  for (const ctx of pinballEngineAudioCtxs) {
     if (ctx.state !== "running") {
       ctx.resume().catch(() => {
         /* ignore — requires user gesture on some browsers */
@@ -282,10 +290,10 @@ export function Pinball({ isOpen, isMinimized, zIndex, isActive }: Props) {
       onRuntimeInitialized() {
         setLoadingText("Starting game…");
         setTimeout(() => setShowOverlay(false), 600);
-        /** SDL may create AudioContexts after load; stop capturing so Webamp isn't pulled in. */
+        /** Short window: long capture lets Winamp (or other apps) get recorded here and then stay suspended forever. */
         captureOffTimer = window.setTimeout(() => {
           w.__pinballCaptureAudio = false;
-        }, 90_000);
+        }, 20_000);
       },
       setStatus(text) {
         if (text) setLoadingText(text);

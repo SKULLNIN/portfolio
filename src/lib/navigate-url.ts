@@ -10,6 +10,9 @@ export function resolveAddressBarInput(
   if (t === "" || /^about:home$/i.test(t) || /^about:blank$/i.test(t)) {
     return { ok: true, url: "about:home" };
   }
+  if (/^about:blog$/i.test(t)) {
+    return { ok: true, url: "about:blog" };
+  }
 
   /* Same-site path — reliable in iframe (must be resolved to absolute URL). */
   if (t.startsWith("/") && !t.startsWith("//") && t.length > 1) {

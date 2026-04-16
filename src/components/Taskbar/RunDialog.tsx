@@ -18,7 +18,7 @@ type Props = {
  *   control → open Control Panel
  *   calc / calculator → open My Computer (we don't have calc)
  *   explorer → opens My Computer
- *   mediaplayer / wmplayer → open Media Player
+ *   winamp / webamp → open Winamp
  */
 const CMD_MAP: Record<string, AppId> = {
   notepad: "notepad",
@@ -28,6 +28,9 @@ const CMD_MAP: Record<string, AppId> = {
   mine: "minesweeper",
   winmine: "minesweeper",
   "winmine.exe": "minesweeper",
+  pinball: "pinball",
+  "pinball.exe": "pinball",
+  "space cadet": "pinball",
   iexplore: "internet-explorer",
   "iexplore.exe": "internet-explorer",
   ie: "internet-explorer",
@@ -38,10 +41,9 @@ const CMD_MAP: Record<string, AppId> = {
   explorer: "my-computer",
   "explorer.exe": "my-computer",
   "my computer": "my-computer",
-  mediaplayer: "media-player",
-  "wmplayer.exe": "media-player",
-  wmplayer: "media-player",
-  "media player": "media-player",
+  winamp: "winamp",
+  "winamp.exe": "winamp",
+  webamp: "winamp",
   "my documents": "my-documents",
   "my pictures": "my-pictures",
   "recycle bin": "recycle-bin",

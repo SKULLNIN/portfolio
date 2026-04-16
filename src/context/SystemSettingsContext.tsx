@@ -13,7 +13,9 @@ import {
 import {
   CP_ACCENT_COLORS,
   CP_WALLPAPERS,
+  wallpaperPreviewStyle,
 } from "@/data/control-panel-content";
+import { isMediaOutsideWebampHost } from "@/lib/media-scope";
 
 const LS = {
   wp: "xp-portfolio-wallpaper",
@@ -56,6 +58,7 @@ function applyAccentCss(hex: string) {
 function applyVolumeToMedia(fraction: number) {
   const v = clamp(fraction, 0, 1);
   document.querySelectorAll("audio, video").forEach((el) => {
+    if (!isMediaOutsideWebampHost(el)) return;
     try {
       (el as HTMLMediaElement).volume = v;
     } catch {
@@ -117,18 +120,9 @@ export function SystemSettingsProvider({ children }: { children: ReactNode }) {
 
   const desktopBackgroundStyle = useMemo((): CSSProperties => {
     const w = CP_WALLPAPERS[wallpaperIndex] ?? CP_WALLPAPERS[0];
-    if ("imageUrl" in w && w.imageUrl) {
-      return {
-        backgroundImage: `url('${w.imageUrl}')`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-      };
-    }
     return {
-      backgroundImage: w.css,
-      backgroundSize: "cover",
-      backgroundPosition: "center",
+      backgroundColor: "#4980c6",
+      ...wallpaperPreviewStyle(w),
       backgroundRepeat: "no-repeat",
     };
   }, [wallpaperIndex]);

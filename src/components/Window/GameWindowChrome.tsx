@@ -2,15 +2,24 @@
 
 import type { ReactNode } from "react";
 
-type Props = { children: ReactNode };
+const DEFAULT_MENUS = ["Game", "Help"] as const;
 
-/** Minesweeper: Game / Help menu strip and classic gray client area. */
-export function GameWindowChrome({ children }: Props) {
+type Props = {
+  children: ReactNode;
+  menus?: readonly string[];
+};
+
+/** Game / Help (or Game / Options / Help) strip + gray client area. */
+export function GameWindowChrome({
+  children,
+  menus = DEFAULT_MENUS,
+}: Props) {
   return (
     <div className="xp-game-frame">
       <div className="xp-game-menubar" aria-hidden="true">
-        <span>Game</span>
-        <span>Help</span>
+        {menus.map((m) => (
+          <span key={m}>{m}</span>
+        ))}
       </div>
       <div className="xp-game-client">{children}</div>
     </div>

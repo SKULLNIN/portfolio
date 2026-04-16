@@ -16,10 +16,17 @@ import { RecycleBin } from "@/components/Apps/RecycleBin";
 import { Notepad } from "@/components/Apps/Notepad";
 import { InternetExplorer } from "@/components/Apps/InternetExplorer";
 import { Minesweeper } from "@/components/Apps/Minesweeper";
-import { MediaPlayer } from "@/components/Apps/MediaPlayer";
+import { Pinball } from "@/components/Apps/Pinball";
+import { Winamp } from "@/components/Apps/Winamp";
+import { Games } from "@/components/Apps/Games";
 import { ControlPanel } from "@/components/Apps/ControlPanel";
+import { MsnMessenger } from "@/components/Apps/MsnMessenger";
 import type { AppId } from "@/types";
 
+/**
+ * Winamp is rendered outside {@link WindowShell} (no XP chrome); its slot here is a sentinel
+ * so the {@link Record} type check still covers every {@link AppId}.
+ */
 const APP_CONTENT: Record<AppId, ReactNode> = {
   "my-computer": <MyComputer />,
   "my-documents": <MyDocuments />,
@@ -28,8 +35,11 @@ const APP_CONTENT: Record<AppId, ReactNode> = {
   notepad: <Notepad />,
   "internet-explorer": <InternetExplorer />,
   minesweeper: <Minesweeper />,
-  "media-player": <MediaPlayer />,
+  pinball: null, // Custom rendered out-of-band like winamp
+  winamp: null,
+  games: <Games />,
   "control-panel": <ControlPanel />,
+  "msn-messenger": <MsnMessenger />,
 };
 
 type VirtualFile = { name: string; content: string };
@@ -65,6 +75,8 @@ export function Desktop() {
   const [autoArrange, setAutoArrange] = useState(true);
   const [showIcons, setShowIcons] = useState(true);
   const [arrangeSubOpen, setArrangeSubOpen] = useState(false);
+  /** Bumps when the user chooses Refresh — remounts desktop icons (Windows-style redraw, no full page reload). */
+  const [desktopPaintKey, setDesktopPaintKey] = useState(0);
 
   const focusedId = useMemo(() => {
     let max = -1;
@@ -91,10 +103,13 @@ export function Desktop() {
     return () => document.removeEventListener("pointerdown", closeIfOutside);
   }, [ctx]);
 
-  const refreshPage = useCallback(() => {
+  /** Like Windows XP desktop Refresh: redraw the workspace only — keeps apps, taskbar, and SPA state. */
+  const refreshDesktop = useCallback(() => {
     setCtx(null);
+    setSelectedKey(null);
+    setDesktopPaintKey((k) => k + 1);
     if (typeof window !== "undefined") {
-      window.location.reload();
+      window.dispatchEvent(new CustomEvent("xp-desktop-refresh"));
     }
   }, []);
 
@@ -123,7 +138,7 @@ export function Desktop() {
 
   return (
     <div
-      className="relative min-h-0 min-w-0 w-full max-w-[100vw] flex-1 overflow-hidden bg-[#4980c6] bg-cover bg-center bg-no-repeat"
+      className="relative min-h-0 min-w-0 w-full max-w-[100vw] flex-1 overflow-hidden bg-cover bg-center bg-no-repeat"
       style={desktopBackgroundStyle}
       onMouseDown={(e) => {
         const el = e.target as HTMLElement;
@@ -225,7 +240,7 @@ export function Desktop() {
             <button
               type="button"
               className="xp-ctx-btn"
-              onClick={refreshPage}
+              onClick={refreshDesktop}
             >
               Refresh
             </button>
@@ -284,6 +299,7 @@ export function Desktop() {
 
       {showIcons && (
         <div
+          key={desktopPaintKey}
           className="xp-desktop-grid wallpaper-grid"
           onMouseDown={(e) => e.stopPropagation()}
         >
@@ -313,12 +329,28 @@ export function Desktop() {
       {ALL_APP_IDS.map((id) => {
         const w = windows[id];
         if (!w.isOpen || w.isMinimized) return null;
+        if (id === "winamp" || id === "pinball") return null;
         return (
           <WindowShell key={id} w={w} isActive={focusedId === id}>
             {APP_CONTENT[id]}
           </WindowShell>
         );
       })}
+
+      {/* Winamp (Webamp) — floats directly on the desktop, no WindowShell chrome. */}
+      <Winamp
+        isOpen={windows.winamp.isOpen}
+        isMinimized={windows.winamp.isMinimized}
+        zIndex={windows.winamp.zIndex}
+      />
+
+      {/* Pinball — authentic XP Luna chrome, floats outside WindowShell (same pattern as Winamp). */}
+      <Pinball
+        isOpen={windows.pinball.isOpen}
+        isMinimized={windows.pinball.isMinimized}
+        zIndex={windows.pinball.zIndex}
+        isActive={focusedId === "pinball"}
+      />
     </div>
   );
 }

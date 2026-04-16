@@ -9,6 +9,7 @@ import {
   CP_SKILLS,
   CP_SYSTEM,
   CP_WALLPAPERS,
+  wallpaperPreviewStyle,
   type CpAppletId,
 } from "@/data/control-panel-content";
 import { useSystemSettings } from "@/context/SystemSettingsContext";
@@ -687,7 +688,11 @@ function getDialogDef(id: CpAppletId, ctx: DlgCtx) {
                 <button
                   type="button"
                   className="xp-cp-preview"
-                  style={{ background: CP_WALLPAPERS[ctx.wpI]?.css }}
+                  style={
+                    CP_WALLPAPERS[ctx.wpI]
+                      ? wallpaperPreviewStyle(CP_WALLPAPERS[ctx.wpI]!)
+                      : undefined
+                  }
                   onClick={() =>
                     ctx.setWpI((ctx.wpI + 1) % CP_WALLPAPERS.length)
                   }
@@ -708,7 +713,7 @@ function getDialogDef(id: CpAppletId, ctx: DlgCtx) {
                       key={w.name}
                       type="button"
                       className={`xp-cp-wp-swatch ${i === ctx.wpI ? "xp-cp-wp-swatch--on" : ""}`}
-                      style={{ background: w.css }}
+                      style={wallpaperPreviewStyle(w)}
                       onClick={() => ctx.setWpI(i)}
                     >
                       <span className="sr-only">{w.name}</span>

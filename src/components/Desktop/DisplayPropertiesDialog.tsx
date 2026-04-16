@@ -1,7 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useState, type CSSProperties } from "react";
-import { CP_ACCENT_COLORS, CP_WALLPAPERS } from "@/data/control-panel-content";
+import {
+  CP_ACCENT_COLORS,
+  CP_WALLPAPERS,
+  wallpaperPreviewStyle,
+} from "@/data/control-panel-content";
 import { useSystemSettings } from "@/context/SystemSettingsContext";
 import { XP_ICONS } from "@/lib/xp-icons";
 
@@ -59,14 +63,7 @@ export function DisplayPropertiesDialog({ open, onClose }: Props) {
   const wp = CP_WALLPAPERS[localWp] ?? CP_WALLPAPERS[0];
   const accentHex = CP_ACCENT_COLORS[localAccent] ?? CP_ACCENT_COLORS[0];
 
-  const sampleBg: CSSProperties =
-    "imageUrl" in wp && wp.imageUrl
-      ? {
-          backgroundImage: `url('${wp.imageUrl}')`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }
-      : { backgroundImage: wp.css, backgroundSize: "cover" };
+  const sampleBg: CSSProperties = wallpaperPreviewStyle(wp);
 
   const sampleTitleBarStyle: CSSProperties = {
     backgroundImage: `linear-gradient(to bottom, ${accentHex}, color-mix(in srgb, ${accentHex} 55%, black))`,
@@ -186,7 +183,7 @@ export function DisplayPropertiesDialog({ open, onClose }: Props) {
               <div>
                 <p className="mb-1 font-bold">Sample:</p>
                 <div
-                  className="xp-dp-sample relative h-[120px] overflow-hidden rounded border border-[#aca899] bg-[#4980c6]"
+                  className="xp-dp-sample relative h-[120px] overflow-hidden rounded border border-[#aca899] bg-[#4980c6] bg-cover bg-center bg-no-repeat"
                   style={sampleBg}
                 >
                   <div className="xp-dp-sample-win absolute left-2 top-2 w-[55%] overflow-hidden border border-[#aca899] bg-[#ece9d8] shadow-sm">
@@ -221,14 +218,14 @@ export function DisplayPropertiesDialog({ open, onClose }: Props) {
               <p className="m-0 text-[10px] text-[#666]">
                 Same wallpapers as Control Panel → Display.
               </p>
-              <div className="xp-cp-wp-grid">
+                <div className="xp-cp-wp-grid">
                 {CP_WALLPAPERS.map((w, i) => (
                   <button
                     key={w.name}
                     type="button"
                     title={w.name}
                     className={`xp-cp-wp-swatch ${i === localWp ? "xp-cp-wp-swatch--on" : ""}`}
-                    style={{ background: w.css }}
+                    style={wallpaperPreviewStyle(w)}
                     onClick={() => setLocalWp(i)}
                   >
                     <span className="sr-only">{w.name}</span>

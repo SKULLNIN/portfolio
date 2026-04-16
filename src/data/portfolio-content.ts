@@ -104,18 +104,21 @@ export type PortfolioProject = {
 export const PROJECTS: PortfolioProject[] = [
   {
     id: "p1sun",
-    title: "P1-Sun / SkyFall — Autonomous UAV Stack",
-    short: "PX4 + ROS 2 Field Integration",
+    title: "L1-Sun / Skytrack",
+    short: "High-speed interceptor vs. loitering / kamikaze-class threats",
     status: "In Progress",
-    stack: ["PX4", "ROS 2", "Jetson", "MAVLink", "Python"],
+    stack: ["PX4", "ROS 2", "MAVLink", "Python"],
     description:
-      "End-to-end autonomy experiments on a custom multirotor stack: flight modes, companion computer bridges, logging, and repeatable field tests. Emphasis on safe iteration and clean bring-up checklists.",
+      "The L1-Sun (Li Sun) interceptor is a high-speed, short-range UAV for intercepting larger kamikaze-style threats—hostile loitering munitions such as the Shahed/Geran-2. It uses a modular, 3D-printed airframe, can reach altitudes up to about 5 km, and after a speed upgrade exceeds 450 km/h with a range of roughly 23 km and endurance over 17 minutes while carrying on the order of 800 g of explosive payload. Developed as my interceptor-drone project, it integrates advanced guidance and a proximity-fuzed warhead for effective counter-UAV operations.",
     githubUrl: OWNER.github,
     imageSrc: "/media/p1sun/cad-top-view.png",
     galleryImages: [
       { src: "/media/p1sun/cad-shell-detail.png", caption: "Shell, sensor module & battery bay" },
+      {
+        src: "/media/p1sun/cad-electronics-stack.png",
+        caption: "Central hub — 55A ESC, flight stack & 3D-printed frame mount",
+      },
     ],
-    moreImageCount: 1,
   },
   {
     id: "crowdsense",
@@ -168,6 +171,10 @@ export const PROJECTS: PortfolioProject[] = [
       {
         when: "16 May 2026",
         label: "OPS-2 competition — IIT Jodhpur (live / recorded flight showcase)",
+      },
+      {
+        when: "17th – 18th July 2026",
+        label: "Round 2 On-Campus Finals — IIT Jodhpur",
       },
     ],
     githubUrl: "https://github.com/SKULLNIN/GNNS_drone-updated2",

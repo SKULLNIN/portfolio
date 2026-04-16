@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { OWNER, PROJECTS } from "@/data/portfolio-content";
 import { XP_ICONS } from "@/lib/xp-icons";
 
@@ -50,18 +51,90 @@ export const CP_PROGRAMS = PROJECTS.map((p) => ({
   date: p.status,
 }));
 
+/**
+ * Windows XP Luna–style wallpaper names (search: “Windows XP Bliss”, “XP Azul wallpaper”, etc.).
+ * Assets live in `public/wallpapers/` (PNG from your Reddit / full-res pack + a few JPG placeholders).
+ */
 export const CP_WALLPAPERS = [
   {
     name: "Bliss",
     css: "linear-gradient(175deg,#4870B8 0%,#84B8EC 50%,#C4EAF8 100%)",
-    /** Full desktop uses photo; Control Panel preview uses `css` */
-    imageUrl: "/wallpapers/bliss.jpg",
+    imageUrl: "/wallpapers/bliss.png",
   },
-  { name: "Autumn", css: "linear-gradient(160deg,#8B4513 0%,#CD853F 50%,#F4A460 100%)" },
-  { name: "Space", css: "linear-gradient(180deg,#000 0%,#0D0D2B 50%,#1A1A4B 100%)" },
-  { name: "Forest", css: "linear-gradient(160deg,#1A4A1A 0%,#2D7A2D 50%,#5AB55A 100%)" },
-  { name: "Ocean", css: "linear-gradient(180deg,#006994 0%,#0099CC 50%,#00BFFF 100%)" },
-];
+  {
+    name: "Autumn",
+    css: "linear-gradient(160deg,#8B4513 0%,#CD853F 50%,#F4A460 100%)",
+    imageUrl: "/wallpapers/autumn.png",
+  },
+  {
+    name: "Azul",
+    css: "linear-gradient(180deg,#006994 0%,#0099CC 50%,#00BFFF 100%)",
+    imageUrl: "/wallpapers/azul.png",
+  },
+  {
+    name: "Crystal",
+    css: "linear-gradient(145deg,#0d3d2a 0%,#1e6b4a 40%,#3d8f6a 100%)",
+    imageUrl: "/wallpapers/crystal.png",
+  },
+  {
+    name: "Friend",
+    css: "linear-gradient(180deg,#001a33 0%,#003366 50%,#006699 100%)",
+    imageUrl: "/wallpapers/friend.png",
+  },
+  {
+    name: "Home",
+    css: "linear-gradient(160deg,#4a3728 0%,#6b5344 50%,#8b7355 100%)",
+    imageUrl: "/wallpapers/home.png",
+  },
+  {
+    name: "Moon Flower",
+    css: "linear-gradient(180deg,#1a4a6e 0%,#2a6a9e 50%,#4a9ece 100%)",
+    imageUrl: "/wallpapers/moon-flower.png",
+  },
+  {
+    name: "Radiance",
+    css: "linear-gradient(175deg,#0067a3 0%,#0099cc 45%,#66d9ff 100%)",
+    imageUrl: "/wallpapers/radiance.png",
+  },
+  {
+    name: "Serenity",
+    css: "linear-gradient(180deg,#0a1628 0%,#1a3a58 50%,#2a5a88 100%)",
+    imageUrl: "/wallpapers/serenity.png",
+  },
+  {
+    name: "Stonehenge",
+    css: "linear-gradient(160deg,#2a3a1a 0%,#4a6a2a 50%,#6a9a4a 100%)",
+    imageUrl: "/wallpapers/stonehenge.jpg",
+  },
+  {
+    name: "Vortec Space",
+    css: "linear-gradient(180deg,#000010 0%,#0a0a28 40%,#1a1a48 100%)",
+    imageUrl: "/wallpapers/vortec.jpg",
+  },
+  {
+    /** Birmingham Bullring — searchable as “Selfridges Birmingham discs building” */
+    name: "Selfridges",
+    css: "linear-gradient(135deg,#1a4a7a 0%,#3a6a9a 45%,#c0d0e0 100%)",
+    imageUrl: "/wallpapers/selfridges.png",
+  },
+] as const;
+
+export type CpWallpaper = (typeof CP_WALLPAPERS)[number];
+
+/** Swatch / preview — full-bleed photo; `css` is only a fallback if `imageUrl` is missing. */
+export function wallpaperPreviewStyle(w: {
+  css: string;
+  imageUrl?: string;
+}): CSSProperties {
+  if (w.imageUrl) {
+    return {
+      backgroundImage: `url('${w.imageUrl}')`,
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+    };
+  }
+  return { backgroundImage: w.css, backgroundSize: "cover" };
+}
 
 export const CP_ACCENT_COLORS = [
   "#316AC5",

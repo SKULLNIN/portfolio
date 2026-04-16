@@ -1,6 +1,12 @@
 "use client";
 
-import { useCallback, useRef, useState, type MouseEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type MouseEvent,
+} from "react";
 import { APP_REGISTRY } from "@/data/apps";
 import { useWindowManager } from "@/context/WindowContext";
 import { queueControlPanelApplet } from "@/lib/control-panel-open";
@@ -24,6 +30,7 @@ import {
   IeIconStop,
   IeIconWindowsLogo,
 } from "@/components/Apps/ie6/IeToolbarIcons";
+import { buildIeBlogSrcDoc } from "@/components/Apps/ie/buildIeBlogSrcDoc";
 import { buildIeHomeSrcDoc } from "@/components/Apps/ie/buildIeHomeSrcDoc";
 import { OWNER } from "@/data/portfolio-content";
 
@@ -45,6 +52,7 @@ export function InternetExplorer() {
 
   const currentUrl = nav.urls[nav.idx] ?? "about:home";
   const isHome = currentUrl === "about:home";
+  const isBlog = currentUrl === "about:blog";
   const canBack = nav.idx > 0;
   const canForward = nav.idx < nav.urls.length - 1;
 
@@ -68,13 +76,13 @@ export function InternetExplorer() {
         );
         return;
       }
-      if (openNewTab && n.url !== "about:home") {
+      if (openNewTab && n.url !== "about:home" && n.url !== "about:blog") {
         window.open(n.url, "_blank", "noopener,noreferrer");
         return;
       }
 
       const navUrl = n.url;
-      if (navUrl !== "about:home" && origin) {
+      if (navUrl !== "about:home" && navUrl !== "about:blog" && origin) {
         try {
           const u = new URL(navUrl);
           const site = new URL(origin);
@@ -95,7 +103,9 @@ export function InternetExplorer() {
       }
 
       pushUrl(navUrl);
-      setAddressInput(navUrl === "about:home" ? "about:blank" : navUrl);
+      setAddressInput(
+        navUrl === "about:home" ? "about:blank" : navUrl
+      );
       setIframeKey((k) => k + 1);
     },
     [addressInput, origin, pushUrl]
@@ -146,6 +156,20 @@ export function InternetExplorer() {
   const onIframeLoad = useCallback(() => {
     setStatus("Done");
   }, []);
+
+  useEffect(() => {
+    const onMsg = (e: MessageEvent) => {
+      if (e.origin !== window.location.origin) return;
+      const d = e.data as { type?: string; url?: string } | undefined;
+      if (d?.type !== "xp-ie-nav" || d.url !== "about:blog") return;
+      pushUrl("about:blog");
+      setAddressInput("about:blog");
+      setIframeKey((k) => k + 1);
+      setStatus("Done");
+    };
+    window.addEventListener("message", onMsg);
+    return () => window.removeEventListener("message", onMsg);
+  }, [pushUrl]);
 
   return (
     <div className="xp-ie-app flex h-full min-h-0 flex-col">
@@ -365,6 +389,18 @@ export function InternetExplorer() {
         >
           Email
         </button>
+        <button
+          type="button"
+          className="xp-ie-favlink"
+          onClick={() => {
+            pushUrl("about:blog");
+            setAddressInput("about:blog");
+            setIframeKey((k) => k + 1);
+            setStatus("Done");
+          }}
+        >
+          Blog
+        </button>
       </div>
 
       <div className="xp-ie-iframe-wrap xp-ie-scrollbar min-h-0 flex-1 bg-white">
@@ -375,6 +411,16 @@ export function InternetExplorer() {
             title="Home"
             className="xp-ie-iframe block h-full w-full border-0"
             srcDoc={origin ? buildIeHomeSrcDoc() : HOME_LOADING_DOC}
+            onLoad={onIframeLoad}
+            sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+          />
+        ) : isBlog ? (
+          <iframe
+            key={`blog-${iframeKey}`}
+            ref={iframeRef}
+            title="Blog"
+            className="xp-ie-iframe block h-full w-full border-0"
+            srcDoc={origin ? buildIeBlogSrcDoc() : HOME_LOADING_DOC}
             onLoad={onIframeLoad}
             sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
           />

@@ -6,8 +6,11 @@ export type AppId =
   | "notepad"
   | "internet-explorer"
   | "minesweeper"
-  | "media-player"
-  | "control-panel";
+  | "pinball"
+  | "winamp"
+  | "games"
+  | "control-panel"
+  | "msn-messenger";
 
 /** Which inner chrome sits below the Luna title bar (matches real Windows XP). */
 export type WindowChromeKind =
@@ -65,4 +68,11 @@ export interface AppDefinition {
   chrome: WindowChromeKind;
   /** Explorer address bar text (only used when chrome === "explorer") */
   explorerAddress?: string;
+  /** Game menu strip labels when chrome === "game" (default: Game, Help) */
+  gameMenus?: readonly string[];
+  /**
+   * When true, the window keeps {@link defaultSize} and cannot be resized (e.g. embedded
+   * games that expect a fixed iframe pixel size).
+   */
+  lockWindowSize?: boolean;
 }

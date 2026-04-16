@@ -12,6 +12,7 @@ import { TaskbarClock } from "@/components/Taskbar/TaskbarClock";
 import { BtcTicker } from "@/components/Taskbar/BtcTicker";
 import { useSystemSettings } from "@/context/SystemSettingsContext";
 import { TASKBAR_TRAY_POPOVER_Z_INDEX } from "@/lib/constants";
+import { isMediaOutsideWebampHost } from "@/lib/media-scope";
 
 /*
  * Windows XP system tray — crypto ticker, volume, clock.
@@ -19,12 +20,15 @@ import { TASKBAR_TRAY_POPOVER_Z_INDEX } from "@/lib/constants";
 
 function applyMuteToMediaElements(muted: boolean) {
   document.querySelectorAll("audio, video").forEach((el) => {
+    if (!isMediaOutsideWebampHost(el)) return;
     try {
       (el as HTMLMediaElement).muted = muted;
     } catch {
       /* ignore */
     }
   });
+  // Webamp uses its own <audio> + gain graph — tray mute must go through its API too
+  window.dispatchEvent(new CustomEvent("xp-mute-change", { detail: { muted } }));
 }
 
 /** Simple XP-style volume popup — synced to {@link SystemSettingsContext} (same as Media Player). */

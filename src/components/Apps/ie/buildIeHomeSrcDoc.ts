@@ -24,7 +24,23 @@ export function buildIeHomeSrcDoc(): string {
   .foot{margin-top:16px;padding-top:8px;border-top:1px solid #d4e4f7;font-size:10px;color:#666;text-align:center;}
   .blink{animation:blink 1.2s step-end infinite;}
   @keyframes blink{50%{opacity:0.4;}}
-</style></head><body>
+</style>
+<script>
+(function(){
+  document.addEventListener("click", function(e) {
+    var el = e.target;
+    while (el && el.tagName !== "A") el = el.parentElement;
+    if (!el || el.tagName !== "A") return;
+    var href = el.getAttribute("href");
+    if (href === "about:blog") {
+      e.preventDefault();
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: "xp-ie-nav", url: "about:blog" }, "*");
+      }
+    }
+  });
+})();
+</script></head><body>
 <div class="topbar"><span class="logo">Link Hub</span> Welcome — ${escapeHtml(OWNER.displayName)}</div>
 <div class="subbar">You are connected · ${String(new Date().getFullYear())} · Best with 1024×768 or larger · 
 <span class="blink">●</span> Live</div>
@@ -38,6 +54,7 @@ export function buildIeHomeSrcDoc(): string {
         <li><a href="${escapeAttr(OWNER.github)}" target="_blank" rel="noopener noreferrer">GitHub profile</a></li>
         <li><a href="${escapeAttr(OWNER.linkedin)}" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
         <li><a href="${escapeAttr(`mailto:${OWNER.email}`)}">Email ${escapeAttr(OWNER.email)}</a></li>
+        <li><a href="about:blog">Blog</a></li>
       </ul>
     </div>
   </div>

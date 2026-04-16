@@ -166,13 +166,13 @@ export function StartMenu({ open, onClose, onShutdownTurnOffComplete }: Props) {
                       type="button"
                       className="xp-sm-sub-item"
                       onClick={() => {
-                        openApp("media-player");
+                        openApp("winamp");
                         onClose();
                       }}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={XP_ICONS.mediaPlayer} alt="" width={16} height={16} className="xp-sm-sub-ico" />
-                      Windows Media Player
+                      <img src={XP_ICONS.winamp} alt="" width={16} height={16} className="xp-sm-sub-ico" />
+                      Winamp
                     </button>
                   </li>
                   <li className="xp-sm-sub-sep" />
@@ -247,6 +247,20 @@ export function StartMenu({ open, onClose, onShutdownTurnOffComplete }: Props) {
                       Minesweeper
                     </button>
                   </li>
+                  <li>
+                    <button
+                      type="button"
+                      className="xp-sm-sub-item"
+                      onClick={() => {
+                        openApp("pinball");
+                        onClose();
+                      }}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={XP_ICONS.pinball} alt="" width={16} height={16} className="xp-sm-sub-ico" />
+                      Pinball
+                    </button>
+                  </li>
                 </ul>
               </details>
             </div>
@@ -273,7 +287,7 @@ export function StartMenu({ open, onClose, onShutdownTurnOffComplete }: Props) {
                 label="My Music"
                 icon={XP_ICONS.myMusic}
                 bold
-                onClick={() => openAndClose("media-player")}
+                onClick={() => openAndClose("winamp")}
               />
               <RightItem
                 label="My Computer"

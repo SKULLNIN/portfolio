@@ -72,14 +72,41 @@ export const APP_REGISTRY: Record<AppDefinition["id"], AppDefinition> = {
     defaultPosition: { x: 200, y: 100 },
     chrome: "game",
   },
-  "media-player": {
-    id: "media-player",
-    title: "Windows Media Player",
-    desktopLabel: "Media Player",
-    icon: XP_ICONS.mediaPlayer,
-    defaultSize: { width: 480, height: 360 },
-    defaultPosition: { x: 140, y: 120 },
+  pinball: {
+    id: "pinball",
+    title: "3D Pinball for Windows - Space Cadet",
+    desktopLabel: "Pinball",
+    icon: XP_ICONS.pinball,
+    /**
+     * Outer window: 600px wide; height fits Luna title bar + ~5px borders + 440px game (Web XP / 98.js.org).
+     * Inner iframe is fixed 600×440 — do not stretch with flex/% (breaks canvas).
+     */
+    defaultSize: { width: 600, height: 490 },
+    defaultPosition: { x: 120, y: 80 },
+    /** Bare: 98.js.org page already has Game / Options / Help + controls; game chrome would duplicate it. */
     chrome: "bare",
+    lockWindowSize: true,
+  },
+  winamp: {
+    id: "winamp",
+    title: "Winamp",
+    desktopLabel: "Winamp",
+    icon: XP_ICONS.winamp,
+    /** webamp.org mounts Winamp's 3-window stack; leave room for them. */
+    defaultSize: { width: 520, height: 560 },
+    defaultPosition: { x: 160, y: 60 },
+    chrome: "bare",
+  },
+  games: {
+    id: "games",
+    title: "Games",
+    desktopLabel: "Games",
+    icon: XP_ICONS.games,
+    /** Simple explorer-style folder showing the installed games as tiles. */
+    defaultSize: { width: 520, height: 380 },
+    defaultPosition: { x: 140, y: 100 },
+    chrome: "explorer",
+    explorerAddress: "C:\\Documents and Settings\\All Users\\Start Menu\\Programs\\Games",
   },
   "control-panel": {
     id: "control-panel",
@@ -90,11 +117,25 @@ export const APP_REGISTRY: Record<AppDefinition["id"], AppDefinition> = {
     defaultPosition: { x: 72, y: 48 },
     chrome: "bare",
   },
+  "msn-messenger": {
+    id: "msn-messenger",
+    title: "MSN Messenger",
+    desktopLabel: "MSN\nMessenger",
+    icon: XP_ICONS.msnMessenger,
+    defaultSize: { width: 520, height: 560 },
+    defaultPosition: { x: 200, y: 60 },
+    chrome: "bare",
+  },
 };
 
 /** Every app in the registry — windows and taskbar tabs must iterate this, not only {@link APP_ORDER}. */
 export const ALL_APP_IDS: AppId[] = Object.keys(APP_REGISTRY) as AppId[];
 
+/**
+ * Desktop icon ordering. Pinball and Minesweeper intentionally omitted — they live inside
+ * the `games` folder app instead of cluttering the desktop. They're still in the registry
+ * so Run / Start Menu can open them directly.
+ */
 export const APP_ORDER: AppDefinition["id"][] = [
   "my-computer",
   "my-documents",
@@ -102,6 +143,7 @@ export const APP_ORDER: AppDefinition["id"][] = [
   "recycle-bin",
   "notepad",
   "internet-explorer",
-  "minesweeper",
-  "media-player",
+  "games",
+  "winamp",
+  "msn-messenger",
 ];

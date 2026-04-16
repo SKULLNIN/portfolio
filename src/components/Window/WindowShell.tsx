@@ -84,7 +84,7 @@ export function WindowShell({ w, isActive, children }: Props) {
     ) : def.chrome === "bare" ? (
       <div className="xp-bare-body">{children}</div>
     ) : (
-      <GameWindowChrome>{children}</GameWindowChrome>
+      <GameWindowChrome menus={def.gameMenus}>{children}</GameWindowChrome>
     );
 
   const body = (
@@ -106,6 +106,7 @@ export function WindowShell({ w, isActive, children }: Props) {
 
   /** Never force a window wider than the desktop client area (fixes narrow phones). */
   const minWinW = Math.max(120, Math.min(280, vp.width));
+  const lockSize = def.lockWindowSize ?? false;
 
   return (
     <Rnd
@@ -113,12 +114,12 @@ export function WindowShell({ w, isActive, children }: Props) {
       style={{ zIndex: w.zIndex }}
       size={rndSize}
       position={rndPosition}
-      minWidth={minWinW}
-      minHeight={160}
-      maxWidth={w.isMaximized ? vp.width : undefined}
-      maxHeight={w.isMaximized ? vp.height : undefined}
+      minWidth={lockSize ? rndSize.width : minWinW}
+      minHeight={lockSize ? rndSize.height : 160}
+      maxWidth={w.isMaximized ? vp.width : lockSize ? rndSize.width : undefined}
+      maxHeight={w.isMaximized ? vp.height : lockSize ? rndSize.height : undefined}
       disableDragging={w.isMaximized}
-      enableResizing={!w.isMaximized}
+      enableResizing={!w.isMaximized && !lockSize}
       dragHandleClassName="xp-luna-titlebar"
       bounds="parent"
       cancel=".xp-luna-controls, .xp-luna-controls button, input, textarea, select, iframe"

@@ -1,6 +1,5 @@
 /**
  * App icons — PNGs in `public/icons/hires/` (high-res Windows XP–style assets).
- * `media-player.png` from [B00merang Windows-XP](https://github.com/B00merang-Artwork/Windows-XP) (GPL-2.0).
  * Most additional icons from "Windows XP High Resolution Icon Pack".
  */
 export const XP_ICONS = {
@@ -12,7 +11,11 @@ export const XP_ICONS = {
   notepad: "/icons/hires/notepad.png",
   internetExplorer: "/icons/hires/internet-explorer.png",
   minesweeper: "/icons/hires/minesweeper.png",
-  mediaPlayer: "/icons/hires/media-player.png",
+  pinball: "/icons/hires/pinball.png",
+  /** Winamp lightning-bolt brand mark (`public/icons/hires/winamp.png`). */
+  winamp: "/icons/hires/winamp.png",
+  /** Generic folder icon — reused for the "Games" folder on the desktop. */
+  games: "/icons/hires/folder-closed.png",
   controlPanel: "/icons/hires/control-panel.png",
   // Additional XP system icons
   folder: "/icons/hires/folder-closed.png",
@@ -49,4 +52,5 @@ export const XP_ICONS = {
   txt: "/icons/hires/txt.png",
   firewall: "/icons/hires/firewall.png",
   securityCenter: "/icons/hires/security-center.png",
+  msnMessenger: "/icons/hires/msn-messenger.png",
 } as const;

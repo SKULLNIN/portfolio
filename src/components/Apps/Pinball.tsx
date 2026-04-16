@@ -27,6 +27,7 @@ import {
   type CSSProperties,
 } from "react";
 import { Rnd } from "react-rnd";
+import { useSystemSettings } from "@/context/SystemSettingsContext";
 import { useWindowManager } from "@/context/WindowContext";
 import { XP_ICONS } from "@/lib/xp-icons";
 
@@ -55,7 +56,76 @@ type EmscriptenStatic = {
 
 /** Module-scoped so the AudioContext capture persists across React re-renders. */
 const capturedAudioCtxs: AudioContext[] = [];
+/** Contexts created while Pinball capture is on — used for routing + master gain. */
+const pinballAudioContexts = new Set<BaseAudioContext>();
 let audioCtxPatched = false;
+let connectPatched = false;
+
+/** Master gain per context (Web Audio has no HTMLMediaElement.volume). */
+const pinballMasterGainByContext = new WeakMap<BaseAudioContext, GainNode>();
+/** Gain nodes we inserted so their own `.connect(destination)` is not re-routed. */
+const pinballMasterGainNodes = new WeakSet<GainNode>();
+
+function clamp01(n: number) {
+  return Math.max(0, Math.min(1, n));
+}
+
+/** Current master level for Pinball (0–1); updated from system volume + tray mute. */
+let pinballMasterLevel = 1;
+
+function applyPinballMasterGains() {
+  const v = clamp01(pinballMasterLevel);
+  for (const ctx of capturedAudioCtxs) {
+    if (ctx.state === "closed") continue;
+    const g = pinballMasterGainByContext.get(ctx);
+    if (g) g.gain.value = v;
+  }
+}
+
+/**
+ * Route `audioNode.connect(context.destination)` through a per-context GainNode so the
+ * tray / Control Panel master volume applies to Pinball (SDL/Web Audio), not only
+ * media elements.
+ */
+function ensurePinballDestinationGainPatch(): void {
+  if (typeof window === "undefined" || connectPatched || typeof AudioNode === "undefined")
+    return;
+  connectPatched = true;
+
+  const origConnect = AudioNode.prototype.connect;
+
+  function ensureMasterGain(ctx: BaseAudioContext): GainNode {
+    let g = pinballMasterGainByContext.get(ctx);
+    if (!g && ctx.state !== "closed") {
+      g = ctx.createGain();
+      g.gain.value = clamp01(pinballMasterLevel);
+      pinballMasterGainByContext.set(ctx, g);
+      pinballMasterGainNodes.add(g);
+      g.connect(ctx.destination);
+    }
+    return g as GainNode;
+  }
+
+  /** Forward all `connect` overloads; route table mix to master gain (Pinball Web Audio). */
+  type ConnectLike = (...args: unknown[]) => unknown;
+  const forward = origConnect as unknown as ConnectLike;
+  (AudioNode.prototype as { connect: ConnectLike }).connect = function (
+    this: AudioNode,
+    ...args: unknown[]
+  ): unknown {
+    const destination = args[0];
+    if (
+      destination instanceof AudioNode &&
+      destination === this.context.destination &&
+      pinballAudioContexts.has(this.context) &&
+      !pinballMasterGainNodes.has(this as GainNode)
+    ) {
+      const gain = ensureMasterGain(this.context);
+      return forward.apply(this, [gain, ...args.slice(1)]);
+    }
+    return forward.apply(this, args);
+  };
+}
 
 /**
  * Install a one-time `AudioContext` wrapper that records new instances into
@@ -64,6 +134,8 @@ let audioCtxPatched = false;
  */
 function ensurePinballAudioCapture(): void {
   if (typeof window === "undefined" || audioCtxPatched) return;
+
+  ensurePinballDestinationGainPatch();
 
   type ACCtor = {
     new (contextOptions?: AudioContextOptions): AudioContext;
@@ -84,7 +156,10 @@ function ensurePinballAudioCapture(): void {
     opts?: AudioContextOptions,
   ): AudioContext {
     const inst = new Orig(opts);
-    if (w.__pinballCaptureAudio) capturedAudioCtxs.push(inst);
+    if (w.__pinballCaptureAudio) {
+      capturedAudioCtxs.push(inst);
+      pinballAudioContexts.add(inst);
+    }
     return inst;
   } as unknown as ACCtor;
 
@@ -131,11 +206,34 @@ function resumePinball(): void {
 
 export function Pinball({ isOpen, isMinimized, zIndex, isActive }: Props) {
   const { closeApp, minimizeApp, focusApp } = useWindowManager();
+  const { volume } = useSystemSettings();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const scriptInjected = useRef(false);
+  /** Tray speaker mute (same event Webamp uses) — master volume slider still updates `volume`. */
+  const trayMutedRef = useRef(false);
   const [loadingText, setLoadingText] = useState("Loading game engine…");
   const [showOverlay, setShowOverlay] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const syncPinballMasterFromSystem = useCallback(() => {
+    pinballMasterLevel = trayMutedRef.current ? 0 : clamp01(volume / 100);
+    applyPinballMasterGains();
+  }, [volume]);
+
+  useEffect(() => {
+    syncPinballMasterFromSystem();
+  }, [syncPinballMasterFromSystem]);
+
+  useEffect(() => {
+    const onTrayMute = (ev: Event) => {
+      const detail = (ev as CustomEvent<{ muted: boolean }>).detail;
+      if (!detail) return;
+      trayMutedRef.current = detail.muted;
+      syncPinballMasterFromSystem();
+    };
+    window.addEventListener("xp-mute-change", onTrayMute);
+    return () => window.removeEventListener("xp-mute-change", onTrayMute);
+  }, [syncPinballMasterFromSystem]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -152,6 +250,8 @@ export function Pinball({ isOpen, isMinimized, zIndex, isActive }: Props) {
     };
     w.__pinballCaptureAudio = true;
 
+    let captureOffTimer: number | undefined;
+
     const mod: EmscriptenStatic = {
       canvas: canvasRef.current,
       /**
@@ -164,6 +264,10 @@ export function Pinball({ isOpen, isMinimized, zIndex, isActive }: Props) {
       onRuntimeInitialized() {
         setLoadingText("Starting game…");
         setTimeout(() => setShowOverlay(false), 600);
+        /** SDL may create AudioContexts after load; stop capturing so Webamp isn't pulled in. */
+        captureOffTimer = window.setTimeout(() => {
+          w.__pinballCaptureAudio = false;
+        }, 30_000);
       },
       setStatus(text) {
         if (text) setLoadingText(text);
@@ -185,12 +289,9 @@ export function Pinball({ isOpen, isMinimized, zIndex, isActive }: Props) {
     };
     document.body.appendChild(script);
 
-    /** SDL audio is created shortly after runtime init. Keep the capture window open
-     *  for a bit, then close it so unrelated AudioContexts (Webamp, etc.) aren't caught. */
-    const stopCaptureTimer = window.setTimeout(() => {
-      w.__pinballCaptureAudio = false;
-    }, 10_000);
-    return () => window.clearTimeout(stopCaptureTimer);
+    return () => {
+      if (captureOffTimer !== undefined) window.clearTimeout(captureOffTimer);
+    };
   }, [isOpen, isMinimized]);
 
   useEffect(() => {
@@ -200,6 +301,9 @@ export function Pinball({ isOpen, isMinimized, zIndex, isActive }: Props) {
     } else {
       resumePinball();
     }
+    return () => {
+      suspendPinball();
+    };
   }, [isOpen, isMinimized]);
 
   const defaultPos = useMemo(() => {
@@ -217,7 +321,11 @@ export function Pinball({ isOpen, isMinimized, zIndex, isActive }: Props) {
 
   const onFocus = useCallback(() => focusApp("pinball"), [focusApp]);
 
-  if (!isOpen) return null;
+  /** After the engine script is queued, keep the same canvas mounted so Emscripten's
+   *  Module.canvas stays valid; hiding beats unmount (reopen was a blank framebuffer). */
+  if (!isOpen && !scriptInjected.current) return null;
+
+  const visiblyOpen = isOpen && !isMinimized;
 
   const titleBarClass = `xp-luna-titlebar ${
     isActive ? "xp-luna-titlebar--active" : "xp-luna-titlebar--inactive"
@@ -226,7 +334,7 @@ export function Pinball({ isOpen, isMinimized, zIndex, isActive }: Props) {
 
   const rootStyle: CSSProperties = {
     zIndex,
-    display: isMinimized ? "none" : "block",
+    display: visiblyOpen ? "block" : "none",
   };
 
   return (

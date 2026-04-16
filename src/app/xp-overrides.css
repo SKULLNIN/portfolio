@@ -5556,6 +5556,10 @@ a.ie-go-open-primary:active {
   color: #000;
   background: #fff;
   line-height: 1.4;
+  /* Draggable chrome / XP shell may set user-select:none — Edge needs explicit text entry */
+  user-select: text;
+  -webkit-user-select: text;
+  -ms-user-select: text;
 }
 
 .msn-input::placeholder {

@@ -1,5 +1,6 @@
 "use client";
 
+import type { MouseEvent } from "react";
 import { Rnd } from "react-rnd";
 import { useWindowManager } from "@/context/WindowContext";
 import type { WindowState } from "@/types";
@@ -87,10 +88,17 @@ export function WindowShell({ w, isActive, children }: Props) {
       <GameWindowChrome menus={def.gameMenus}>{children}</GameWindowChrome>
     );
 
+  const bodyMouseDown = (e: MouseEvent<HTMLDivElement>) => {
+    const t = e.target as HTMLElement | null;
+    if (t?.closest("textarea, input, select, [contenteditable='true'], [contenteditable='']"))
+      return;
+    onFocus();
+  };
+
   const body = (
     <div
       className={`xp-luna-body ${isActive ? "" : "opacity-[0.97]"}`}
-      onMouseDown={onFocus}
+      onMouseDown={bodyMouseDown}
     >
       {inner}
     </div>
@@ -122,7 +130,8 @@ export function WindowShell({ w, isActive, children }: Props) {
       enableResizing={!w.isMaximized && !lockSize}
       dragHandleClassName="xp-luna-titlebar"
       bounds="parent"
-      cancel=".xp-luna-controls, .xp-luna-controls button, input, textarea, select, iframe"
+      enableUserSelectHack={false}
+      cancel=".xp-luna-controls, .xp-luna-controls button, input, textarea, select, iframe, [contenteditable], .msn-input, .msn-input-wrap, .msn-input-container, .msn-emoji-picker, .msn-format-bar"
       onDrag={(_e, d) => {
         if (w.isMaximized) return;
         dispatch({

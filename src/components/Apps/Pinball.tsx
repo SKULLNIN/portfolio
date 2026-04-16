@@ -172,12 +172,11 @@ function ensurePinballAudioCapture(): void {
 
 function suspendPinball(): void {
   if (typeof window === "undefined") return;
+  /** Suspend every captured context — `running` check alone misses edge states in some browsers. */
   for (const ctx of capturedAudioCtxs) {
-    if (ctx.state === "running") {
-      ctx.suspend().catch(() => {
-        /* context may already be closing */
-      });
-    }
+    void ctx.suspend().catch(() => {
+      /* context may already be closing */
+    });
   }
   const mod = (window as unknown as { Module?: EmscriptenStatic }).Module;
   try {
@@ -267,7 +266,7 @@ export function Pinball({ isOpen, isMinimized, zIndex, isActive }: Props) {
         /** SDL may create AudioContexts after load; stop capturing so Webamp isn't pulled in. */
         captureOffTimer = window.setTimeout(() => {
           w.__pinballCaptureAudio = false;
-        }, 30_000);
+        }, 90_000);
       },
       setStatus(text) {
         if (text) setLoadingText(text);
@@ -306,6 +305,34 @@ export function Pinball({ isOpen, isMinimized, zIndex, isActive }: Props) {
     };
   }, [isOpen, isMinimized]);
 
+  /** Tab hidden: stop audio/CPU; visible again: rebind canvas (some engines lose WebGL after hide). */
+  useEffect(() => {
+    const onVis = () => {
+      if (!scriptInjected.current) return;
+      if (document.hidden) {
+        suspendPinball();
+        return;
+      }
+      if (isOpen && !isMinimized) resumePinball();
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, [isOpen, isMinimized]);
+
+  /** When the window is shown again, point Emscripten at the live canvas and nudge a redraw. */
+  useEffect(() => {
+    if (!isOpen || isMinimized) return;
+    if (!scriptInjected.current) return;
+    const w = window as unknown as { Module?: EmscriptenStatic };
+    const canvas = canvasRef.current;
+    const mod = w.Module;
+    if (mod && canvas) mod.canvas = canvas;
+    const t = window.setTimeout(() => {
+      window.dispatchEvent(new Event("resize"));
+    }, 0);
+    return () => window.clearTimeout(t);
+  }, [isOpen, isMinimized]);
+
   const defaultPos = useMemo(() => {
     if (typeof window === "undefined") return { x: 120, y: 80 };
     return {
@@ -332,9 +359,16 @@ export function Pinball({ isOpen, isMinimized, zIndex, isActive }: Props) {
   }`;
   const windowClass = `xp-luna-window ${isActive ? "xp-luna-window--active" : ""}`;
 
+  /** Avoid `display:none` — Chromium/Edge often tear down WebGL/canvas backing when hidden that way (blank + audio only). */
   const rootStyle: CSSProperties = {
     zIndex,
-    display: visiblyOpen ? "block" : "none",
+    ...(visiblyOpen
+      ? { visibility: "visible", opacity: 1, pointerEvents: "auto" }
+      : {
+          visibility: "hidden",
+          opacity: 0,
+          pointerEvents: "none",
+        }),
   };
 
   return (
@@ -355,6 +389,7 @@ export function Pinball({ isOpen, isMinimized, zIndex, isActive }: Props) {
       bounds="parent"
       dragHandleClassName="xp-luna-titlebar"
       cancel=".xp-luna-controls, .xp-luna-controls button"
+      enableUserSelectHack={false}
       onMouseDown={onFocus}
       style={rootStyle}
     >

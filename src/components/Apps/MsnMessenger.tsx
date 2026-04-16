@@ -57,13 +57,15 @@ export function MsnMessenger() {
   const [showEmoji, setShowEmoji] = useState(false);
   const [isShaking, setIsShaking] = useState(false);
   const [typing, setTyping] = useState(false);
-  const chatEndRef = useRef<HTMLDivElement>(null);
+  const chatMessagesRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const emojiRef = useRef<HTMLDivElement>(null);
 
-  /* scroll to bottom on new messages */
+  /* Scroll chat to bottom — avoid scrollIntoView (can steal focus / glitch IME in Edge). */
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const el = chatMessagesRef.current;
+    if (!el) return;
+    el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
   }, [messages, typing]);
 
   /* persist */
@@ -185,7 +187,7 @@ export function MsnMessenger() {
             To: <strong>{OWNER.displayName}</strong>
           </div>
 
-          <div className="msn-chat-messages">
+          <div className="msn-chat-messages" ref={chatMessagesRef}>
             {/* Welcome message (always shown) */}
             <div className="msn-system-msg">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -231,7 +233,6 @@ export function MsnMessenger() {
               </div>
             )}
 
-            <div ref={chatEndRef} />
           </div>
         </div>
 
@@ -307,6 +308,9 @@ export function MsnMessenger() {
               className="msn-input"
               placeholder="Type your message here..."
               value={draft}
+              name="msn-message"
+              autoComplete="off"
+              spellCheck
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {

@@ -85,6 +85,17 @@ export function MsnMessenger() {
     return () => document.removeEventListener("pointerdown", handler);
   }, [showEmoji]);
 
+  /** Pinball leaves the canvas focused / capturing input; restore MSN typing after it closes. */
+  useEffect(() => {
+    const onPinballClosed = () => {
+      requestAnimationFrame(() => {
+        inputRef.current?.focus({ preventScroll: true });
+      });
+    };
+    window.addEventListener("xp-pinball-closed", onPinballClosed);
+    return () => window.removeEventListener("xp-pinball-closed", onPinballClosed);
+  }, []);
+
   const addMessage = useCallback(
     (sender: "me" | "owner", text: string) => {
       const msg: ChatMessage = {

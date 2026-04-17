@@ -53,4 +53,8 @@ export const XP_ICONS = {
   firewall: "/icons/hires/firewall.png",
   securityCenter: "/icons/hires/security-center.png",
   msnMessenger: "/icons/hires/msn-messenger.png",
+  /** MS-DOS / Command Prompt style — used for js-dos 8 player. */
+  jsDos: "/icons/hires/command-prompt.png",
+  /** DOOM wordmark (user-provided, trimmed). */
+  doom: "/icons/hires/doom.png",
 } as const;

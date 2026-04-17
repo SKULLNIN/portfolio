@@ -21,6 +21,7 @@ import { Winamp } from "@/components/Apps/Winamp";
 import { Games } from "@/components/Apps/Games";
 import { ControlPanel } from "@/components/Apps/ControlPanel";
 import { MsnMessenger } from "@/components/Apps/MsnMessenger";
+import { JsDosPlayer } from "@/components/Apps/JsDosPlayer";
 import type { AppId } from "@/types";
 
 /**
@@ -40,6 +41,8 @@ const APP_CONTENT: Record<AppId, ReactNode> = {
   games: <Games />,
   "control-panel": <ControlPanel />,
   "msn-messenger": <MsnMessenger />,
+  "js-dos": <JsDosPlayer bundleUrl="/pinball/bundles/digger.jsdos" />,
+  doom: <JsDosPlayer bundleUrl="https://v8.js-dos.com/bundles/doom.jsdos" />,
 };
 
 type VirtualFile = { name: string; content: string };

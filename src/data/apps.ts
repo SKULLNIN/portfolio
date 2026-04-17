@@ -126,6 +126,24 @@ export const APP_REGISTRY: Record<AppDefinition["id"], AppDefinition> = {
     defaultPosition: { x: 200, y: 60 },
     chrome: "bare",
   },
+  "js-dos": {
+    id: "js-dos",
+    title: "MS-DOS Prompt (js-dos 8)",
+    desktopLabel: "DOS\nPlayer",
+    icon: XP_ICONS.jsDos,
+    defaultSize: { width: 720, height: 520 },
+    defaultPosition: { x: 96, y: 72 },
+    chrome: "bare",
+  },
+  doom: {
+    id: "doom",
+    title: "DOOM",
+    desktopLabel: "DOOM",
+    icon: XP_ICONS.doom,
+    defaultSize: { width: 800, height: 620 },
+    defaultPosition: { x: 72, y: 48 },
+    chrome: "bare",
+  },
 };
 
 /** Every app in the registry — windows and taskbar tabs must iterate this, not only {@link APP_ORDER}. */

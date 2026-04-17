@@ -10,7 +10,10 @@ export type AppId =
   | "winamp"
   | "games"
   | "control-panel"
-  | "msn-messenger";
+  | "msn-messenger"
+  | "js-dos"
+  /** DOOM (1993) shareware episode — bundle hosted on v8.js-dos.com for js-dos 8. */
+  | "doom";
 
 /** Which inner chrome sits below the Luna title bar (matches real Windows XP). */
 export type WindowChromeKind =

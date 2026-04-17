@@ -14,6 +14,7 @@ import { FullscreenPrompt } from "@/components/FullscreenPrompt";
 import { XpWelcomeScreen } from "@/components/XpWelcomeScreen";
 import { TASKBAR_HEIGHT_PX, TASKBAR_SHELL_Z_INDEX } from "@/lib/constants";
 import { exitAppFullscreen } from "@/lib/fullscreen";
+import { installJsDosFriendlyShims } from "@/lib/js-dos-shims";
 
 /**
  * Boot phases:
@@ -44,6 +45,12 @@ function ShellInner() {
     openedIe.current = false;
     setPhase("welcome");
   }, [dispatch]);
+
+  /** Install early so lock/orientation rejections are handled before js-dos mounts. */
+  useEffect(() => {
+    if (phase !== "desktop") return;
+    installJsDosFriendlyShims();
+  }, [phase]);
 
   /** Reset document scroll after boot / viewport changes (mobile URL bar, rotation). */
   useEffect(() => {

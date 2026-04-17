@@ -33,6 +33,10 @@ const AUTO_REPLIES = [
 
 const STORAGE_KEY = "msn-messenger-history";
 
+/** When true, chat is blocked by a transparent overlay until the service date. */
+const MSN_UNDER_MAINTENANCE = true;
+const MSN_MAINTENANCE_AVAILABLE_FROM = "20 April 2026";
+
 function loadMessages(): ChatMessage[] {
   if (typeof window === "undefined") return [];
   try {
@@ -84,17 +88,6 @@ export function MsnMessenger() {
     document.addEventListener("pointerdown", handler);
     return () => document.removeEventListener("pointerdown", handler);
   }, [showEmoji]);
-
-  /** Pinball leaves the canvas focused / capturing input; restore MSN typing after it closes. */
-  useEffect(() => {
-    const onPinballClosed = () => {
-      requestAnimationFrame(() => {
-        inputRef.current?.focus({ preventScroll: true });
-      });
-    };
-    window.addEventListener("xp-pinball-closed", onPinballClosed);
-    return () => window.removeEventListener("xp-pinball-closed", onPinballClosed);
-  }, []);
 
   const addMessage = useCallback(
     (sender: "me" | "owner", text: string) => {
@@ -158,6 +151,21 @@ export function MsnMessenger() {
     <div
       className={`msn-messenger-root ${isShaking ? "msn-shake" : ""}`}
     >
+      {MSN_UNDER_MAINTENANCE && (
+        <div
+          className="msn-maintenance-overlay"
+          aria-hidden="true"
+        >
+          <div className="msn-maintenance-panel" role="status">
+            <p className="msn-maintenance-title">Under maintenance</p>
+            <p className="msn-maintenance-body">
+              MSN Messenger is temporarily unavailable. Service is expected to resume from{" "}
+              <strong>{MSN_MAINTENANCE_AVAILABLE_FROM}</strong>.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* ─── MSN Toolbar ─── */}
       <div className="msn-toolbar">
         <div className="msn-toolbar-buttons">

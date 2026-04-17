@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
+import Script from "next/script";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -28,6 +29,10 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full">
       <head>
+        <Script
+          src="/lock-rejection-silencer.js"
+          strategy="beforeInteractive"
+        />
         <link
           rel="stylesheet"
           href="https://unpkg.com/xp.css@0.2.6/dist/XP.css"

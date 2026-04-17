@@ -5183,6 +5183,7 @@ a.ie-go-open-primary:active {
 
 /* root — fills the bare-body container */
 .msn-messenger-root {
+  position: relative;
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -5192,6 +5193,58 @@ a.ie-go-open-primary:active {
   font-size: 12px;
   color: #000;
   overflow: hidden;
+}
+
+/* Maintenance — semi-transparent layer; panel lifts slightly on hover */
+.msn-maintenance-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.42);
+  backdrop-filter: blur(1px);
+  pointer-events: auto;
+}
+
+.msn-maintenance-panel {
+  max-width: 300px;
+  padding: 14px 18px;
+  text-align: center;
+  background: linear-gradient(180deg, #fffef8 0%, #ece8dc 100%);
+  border: 1px solid #a7a394;
+  border-radius: 4px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.22);
+  transition:
+    box-shadow 0.18s ease,
+    transform 0.18s ease,
+    background 0.18s ease;
+}
+
+.msn-maintenance-panel:hover {
+  box-shadow: 3px 5px 14px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+  background: linear-gradient(180deg, #ffffff 0%, #f4f0e6 100%);
+}
+
+.msn-maintenance-title {
+  margin: 0 0 8px;
+  font-weight: bold;
+  font-size: 13px;
+  color: #0a246a;
+}
+
+.msn-maintenance-body {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: #222;
+}
+
+.msn-maintenance-body strong {
+  color: #0a246a;
 }
 
 /* Nudge shake animation */

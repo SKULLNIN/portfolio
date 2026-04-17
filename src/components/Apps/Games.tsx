@@ -31,6 +31,18 @@ const GAMES: readonly GameEntry[] = [
     description: "Flag the mines without detonating any. Left-click to dig.",
     icon: XP_ICONS.minesweeper,
   },
+  {
+    id: "js-dos",
+    label: "DOS (js-dos 8)",
+    description: "Digger demo via js-dos — same stack as dos.zone / v8.js-dos.com.",
+    icon: APP_REGISTRY["js-dos"].icon,
+  },
+  {
+    id: "doom",
+    label: "DOOM",
+    description: "Classic shareware episode in-browser (js-dos 8 bundle from v8.js-dos.com).",
+    icon: APP_REGISTRY.doom.icon,
+  },
 ];
 
 export function Games() {
@@ -64,6 +76,24 @@ export function Games() {
                   onClick={() => openApp("minesweeper")}
                 >
                   Play Minesweeper
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  className="xp-mc-link"
+                  onClick={() => openApp("js-dos")}
+                >
+                  DOS (js-dos 8)
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  className="xp-mc-link"
+                  onClick={() => openApp("doom")}
+                >
+                  DOOM
                 </button>
               </li>
             </ul>

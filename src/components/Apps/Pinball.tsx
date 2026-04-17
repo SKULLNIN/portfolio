@@ -194,41 +194,6 @@ function ensurePinballAudioCapture(): void {
  * Chromium/Brave can leave the tab's Web Audio in a bad state where other apps (e.g. Winamp)
  * stay silent until a full reload.
  */
-/**
- * SDL/Emscripten keeps the canvas focused and can hold pointer capture — that steals
- * keyboard/pointer from the rest of the XP shell (e.g. MSN Messenger) until blur/refresh.
- */
-function blurPinballSurface(): void {
-  if (typeof document === "undefined") return;
-  const mod = (window as unknown as { Module?: EmscriptenStatic }).Module;
-  const canvas =
-    mod?.canvas ?? (document.getElementById("canvas") as HTMLCanvasElement | null);
-  if (!canvas) return;
-  try {
-    canvas.blur();
-  } catch {
-    /* ignore */
-  }
-  if (document.pointerLockElement === canvas) {
-    try {
-      document.exitPointerLock();
-    } catch {
-      /* ignore */
-    }
-  }
-  const el = canvas as HTMLCanvasElement & {
-    hasPointerCapture?: (id: number) => boolean;
-    releasePointerCapture?: (id: number) => void;
-  };
-  for (let id = 0; id < 16; id++) {
-    try {
-      if (el.hasPointerCapture?.(id)) el.releasePointerCapture?.(id);
-    } catch {
-      /* ignore */
-    }
-  }
-}
-
 function suspendPinball(): void {
   if (typeof window === "undefined") return;
   pinballForceSilent = true;
@@ -239,7 +204,6 @@ function suspendPinball(): void {
   } catch {
     /* ignore */
   }
-  blurPinballSurface();
 }
 
 function resumePinball(): void {
@@ -427,8 +391,7 @@ export function Pinball({ isOpen, isMinimized, zIndex, isActive }: Props) {
 
   /** Avoid `display:none` — Chromium/Edge often tear down WebGL/canvas backing when hidden that way (blank + audio only). */
   const rootStyle: CSSProperties = {
-    /** When hidden, sit below normal windows so nothing (Brave) hit-tests this layer by mistake. */
-    zIndex: visiblyOpen ? zIndex : 0,
+    zIndex,
     ...(visiblyOpen
       ? { visibility: "visible", opacity: 1, pointerEvents: "auto" }
       : {
@@ -440,7 +403,7 @@ export function Pinball({ isOpen, isMinimized, zIndex, isActive }: Props) {
 
   return (
     <Rnd
-      className={visiblyOpen ? "pointer-events-auto" : "pointer-events-none"}
+      className="pointer-events-auto"
       default={{
         x: defaultPos.x,
         y: defaultPos.y,
@@ -460,10 +423,7 @@ export function Pinball({ isOpen, isMinimized, zIndex, isActive }: Props) {
       onMouseDown={onFocus}
       style={rootStyle}
     >
-      <div
-        className={`${windowClass} h-full w-full`}
-        inert={!visiblyOpen ? true : undefined}
-      >
+      <div className={`${windowClass} h-full w-full`}>
         <div className={titleBarClass} onMouseDown={onFocus}>
           <div className="xp-luna-label">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -506,7 +466,6 @@ export function Pinball({ isOpen, isMinimized, zIndex, isActive }: Props) {
           <canvas
             ref={canvasRef}
             id="canvas"
-            tabIndex={visiblyOpen ? 0 : -1}
             onContextMenu={(e) => e.preventDefault()}
             width={GAME_WIDTH}
             height={GAME_HEIGHT}
@@ -516,7 +475,6 @@ export function Pinball({ isOpen, isMinimized, zIndex, isActive }: Props) {
               height: GAME_HEIGHT,
               background: "#000",
               cursor: "pointer",
-              pointerEvents: visiblyOpen ? "auto" : "none",
             }}
           />
 

@@ -5865,6 +5865,61 @@ a.ie-go-open-primary:active {
   -webkit-box-orient: vertical;
 }
 
+.msn-inbox-conv-item {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.msn-inbox-conv-item .msn-inbox-conv-btn {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.msn-inbox-conv-del {
+  flex-shrink: 0;
+  width: 28px;
+  padding: 0;
+  border: 1px solid #c08080;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #fff8f8 0%, #f0e0e0 100%);
+  color: #8a2020;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.msn-inbox-conv-del:hover:not(:disabled) {
+  background: linear-gradient(180deg, #ffecec 0%, #e8c8c8 100%);
+}
+
+.msn-inbox-conv-del:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.msn-inbox-delete-thread {
+  padding: 4px 10px;
+  font-size: 11px;
+  font-family: inherit;
+  cursor: pointer;
+  border: 1px solid #c08080;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #fff8f8 0%, #f0e4e4 100%);
+  color: #820808;
+}
+
+.msn-inbox-delete-thread:hover:not(:disabled) {
+  background: linear-gradient(180deg, #ffe8e8 0%, #e8d0d0 100%);
+}
+
+.msn-inbox-delete-thread:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 .msn-inbox-main {
   display: flex;
   flex-direction: column;
@@ -5874,6 +5929,11 @@ a.ie-go-open-primary:active {
 }
 
 .msn-inbox-main-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
   padding: 8px 12px;
   font-size: 11px;
   font-weight: bold;

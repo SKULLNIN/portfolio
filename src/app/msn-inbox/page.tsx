@@ -32,6 +32,7 @@ export default function MsnInboxPage() {
   const [listLoading, setListLoading] = useState(false);
   const [threadLoading, setThreadLoading] = useState(false);
   const [sending, setSending] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const msgLogRef = useRef<HTMLDivElement>(null);
 
@@ -135,6 +136,39 @@ export default function MsnInboxPage() {
     setConversations([]);
     setSelectedId(null);
     setMessages([]);
+  };
+
+  const deleteConversation = async (conversationId: string, guestLabel: string) => {
+    if (!authHeader.trim()) return;
+    if (
+      !window.confirm(
+        `Delete conversation with ${guestLabel}? All messages will be permanently removed. This cannot be undone.`
+      )
+    ) {
+      return;
+    }
+    setDeletingId(conversationId);
+    setError(null);
+    try {
+      const res = await fetch(
+        `/api/msn/owner/conversation?conversationId=${encodeURIComponent(conversationId)}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${authHeader.trim()}` },
+        }
+      );
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(typeof data.error === "string" ? data.error : res.statusText);
+      if (selectedId === conversationId) {
+        setSelectedId(null);
+        setMessages([]);
+      }
+      await fetchConversations({ silent: true });
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   const sendReply = async () => {
@@ -243,7 +277,7 @@ export default function MsnInboxPage() {
                     <li className="msn-inbox-empty">No conversations yet — open MSN on the portfolio as a visitor.</li>
                   )}
                   {conversations.map((c) => (
-                    <li key={c.id}>
+                    <li key={c.id} className="msn-inbox-conv-item">
                       <button
                         type="button"
                         className={`msn-inbox-conv-btn ${selectedId === c.id ? "msn-inbox-conv-btn--active" : ""}`}
@@ -252,6 +286,20 @@ export default function MsnInboxPage() {
                         <div className="msn-inbox-conv-name">{c.guestDisplayName}</div>
                         <div className="msn-inbox-conv-preview">{c.lastMessage ?? "—"}</div>
                       </button>
+                      <button
+                        type="button"
+                        className="msn-inbox-conv-del"
+                        title={`Remove ${c.guestDisplayName}`}
+                        disabled={deletingId !== null}
+                        aria-label={`Delete conversation with ${c.guestDisplayName}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          void deleteConversation(c.id, c.guestDisplayName);
+                        }}
+                      >
+                        ×
+                      </button>
                     </li>
                   ))}
                 </ul>
@@ -259,15 +307,27 @@ export default function MsnInboxPage() {
 
               <section className="msn-inbox-main">
                 <div className="msn-inbox-main-head">
-                  {selectedConv ? (
-                    <>
-                      To: <strong>{selectedConv.guestDisplayName}</strong>
-                      {selectedConv.guestUsername && (
-                        <span style={{ color: "#666", fontWeight: "normal" }}> ({selectedConv.guestUsername})</span>
-                      )}
-                    </>
-                  ) : (
-                    "Select a conversation"
+                  <span>
+                    {selectedConv ? (
+                      <>
+                        To: <strong>{selectedConv.guestDisplayName}</strong>
+                        {selectedConv.guestUsername && (
+                          <span style={{ color: "#666", fontWeight: "normal" }}> ({selectedConv.guestUsername})</span>
+                        )}
+                      </>
+                    ) : (
+                      "Select a conversation"
+                    )}
+                  </span>
+                  {selectedConv && (
+                    <button
+                      type="button"
+                      className="msn-inbox-delete-thread"
+                      disabled={deletingId !== null || sending}
+                      onClick={() => void deleteConversation(selectedConv.id, selectedConv.guestDisplayName)}
+                    >
+                      {deletingId === selectedConv.id ? "Deleting…" : "Delete conversation"}
+                    </button>
                   )}
                 </div>
 
@@ -319,7 +379,7 @@ export default function MsnInboxPage() {
                     type="button"
                     className="msn-send-btn"
                     style={{ margin: 0 }}
-                    disabled={!selectedId || !draft.trim() || sending}
+                    disabled={!selectedId || !draft.trim() || sending || deletingId !== null}
                     onClick={() => void sendReply()}
                   >
                     {sending ? "Sending…" : "Send"}

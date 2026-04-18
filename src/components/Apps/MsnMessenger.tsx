@@ -2,14 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { OWNER } from "@/data/portfolio-content";
-
-/* ─── types ─── */
-type ChatMessage = {
-  id: string;
-  sender: "me" | "owner";
-  text: string;
-  timestamp: number;
-};
+import { isMsnLiveConfigured } from "@/lib/msn/env";
+import { useMsnLiveChat, type ChatMessage } from "@/hooks/useMsnLiveChat";
 
 /* ─── emoji set (classic MSN emoticons) ─── */
 const MSN_EMOJIS = [
@@ -33,8 +27,9 @@ const AUTO_REPLIES = [
 
 const STORAGE_KEY = "msn-messenger-history";
 
-/** When true, chat is blocked by a transparent overlay until the service date. */
-const MSN_UNDER_MAINTENANCE = true;
+/** Live Supabase chat removes the maintenance overlay when env is fully configured. */
+const MSN_LIVE = isMsnLiveConfigured();
+const MSN_UNDER_MAINTENANCE = !MSN_LIVE;
 const MSN_MAINTENANCE_AVAILABLE_FROM = "20 April 2026";
 
 function loadMessages(): ChatMessage[] {
@@ -56,7 +51,21 @@ function saveMessages(msgs: ChatMessage[]) {
 }
 
 export function MsnMessenger() {
-  const [messages, setMessages] = useState<ChatMessage[]>(loadMessages);
+  const {
+    messages: liveMessages,
+    ready: liveReady,
+    error: liveError,
+    sendError,
+    clearSendError,
+    sendText,
+    sendNudgeLive,
+  } = useMsnLiveChat(MSN_LIVE);
+  const liveActive = MSN_LIVE && liveReady && !liveError;
+  const connectingLive = MSN_LIVE && !liveReady && !liveError;
+
+  const [localMessages, setLocalMessages] = useState<ChatMessage[]>(() => loadMessages());
+  const displayMessages = liveActive ? liveMessages : localMessages;
+
   const [draft, setDraft] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
   const [isShaking, setIsShaking] = useState(false);
@@ -70,12 +79,13 @@ export function MsnMessenger() {
     const el = chatMessagesRef.current;
     if (!el) return;
     el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
-  }, [messages, typing]);
+  }, [displayMessages, typing]);
 
-  /* persist */
+  /* persist offline thread only */
   useEffect(() => {
-    saveMessages(messages);
-  }, [messages]);
+    if (liveActive) return;
+    saveMessages(localMessages);
+  }, [localMessages, liveActive]);
 
   /* close emoji picker on outside click */
   useEffect(() => {
@@ -97,7 +107,7 @@ export function MsnMessenger() {
         text,
         timestamp: Date.now(),
       };
-      setMessages((prev) => [...prev, msg]);
+      setLocalMessages((prev) => [...prev, msg]);
       return msg;
     },
     []
@@ -107,6 +117,20 @@ export function MsnMessenger() {
   const sendMessage = useCallback(() => {
     const text = draft.trim();
     if (!text) return;
+
+    if (liveActive) {
+      void sendText(text)
+        .then(() => {
+          setDraft("");
+          clearSendError();
+          inputRef.current?.focus();
+        })
+        .catch(() => {
+          /* sendError set inside hook */
+        });
+      return;
+    }
+
     addMessage("me", text);
     setDraft("");
     inputRef.current?.focus();
@@ -119,18 +143,29 @@ export function MsnMessenger() {
       const reply = AUTO_REPLIES[Math.floor(Math.random() * AUTO_REPLIES.length)];
       addMessage("owner", reply);
     }, delay);
-  }, [draft, addMessage]);
+  }, [draft, addMessage, liveActive, sendText, clearSendError]);
 
   /* nudge */
   const sendNudge = useCallback(() => {
     if (isShaking) return;
     setIsShaking(true);
+
+    if (liveActive) {
+      void sendNudgeLive().finally(() => {
+        setTimeout(() => setIsShaking(false), 600);
+      });
+      const audio = new Audio("/sounds/nudge.wav");
+      audio.volume = 0.3;
+      audio.play().catch(() => {});
+      return;
+    }
+
     addMessage("me", "🔔 You have sent a nudge!");
     const audio = new Audio("/sounds/nudge.wav");
     audio.volume = 0.3;
     audio.play().catch(() => {});
     setTimeout(() => setIsShaking(false), 600);
-  }, [isShaking, addMessage]);
+  }, [isShaking, addMessage, liveActive, sendNudgeLive]);
 
   /* insert emoji */
   const insertEmoji = useCallback(
@@ -159,8 +194,9 @@ export function MsnMessenger() {
           <div className="msn-maintenance-panel" role="status">
             <p className="msn-maintenance-title">Under maintenance</p>
             <p className="msn-maintenance-body">
-              MSN Messenger is temporarily unavailable. Service is expected to resume from{" "}
-              <strong>{MSN_MAINTENANCE_AVAILABLE_FROM}</strong>.
+              MSN Messenger is offline until live chat is configured (Supabase env vars), or try again after{" "}
+              <strong>{MSN_MAINTENANCE_AVAILABLE_FROM}</strong>. Open{" "}
+              <code style={{ fontSize: 11 }}>/msn-inbox</code> as the owner to reply when live chat is enabled.
             </p>
           </div>
         </div>
@@ -207,6 +243,28 @@ export function MsnMessenger() {
           </div>
 
           <div className="msn-chat-messages" ref={chatMessagesRef}>
+            {MSN_LIVE && liveError && (
+              <div className="msn-live-banner" role="alert">
+                Live chat error: {liveError}. Showing offline demo chat instead.
+              </div>
+            )}
+            {liveActive && sendError && (
+              <div className="msn-live-banner" role="alert">
+                Could not send: {sendError}
+                <button
+                  type="button"
+                  className="msn-live-banner-dismiss"
+                  onClick={() => clearSendError()}
+                >
+                  Dismiss
+                </button>
+              </div>
+            )}
+            {connectingLive && (
+              <div className="msn-live-banner msn-live-banner--info" role="status">
+                Connecting to live chat…
+              </div>
+            )}
             {/* Welcome message (always shown) */}
             <div className="msn-system-msg">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -218,17 +276,15 @@ export function MsnMessenger() {
                 className="msn-system-ico"
               />
               <span>
-                This is a live chat window. Your messages will be delivered to me
-                just like in a real chat application. I will reply to you as much
-                as I can (please forgive me if I reply late). When you return to
-                the site later, you can see your message history. If you delete
-                the data stored in your browser for this site, you won&apos;t be
-                able to access this conversation again.
+                {MSN_LIVE
+                  ? "This window uses Supabase Realtime: messages sync to the database and appear on my inbox at /msn-inbox. Your guest session is anonymous (saved in this browser)."
+                  : "This is a demo chat stored in your browser until live Supabase chat is enabled. When live, messages sync in real time and I can reply from my inbox."}{" "}
+                When you return later, offline history stays in this browser unless you clear site data.
               </span>
             </div>
 
             {/* Messages */}
-            {messages.map((m) => (
+            {displayMessages.map((m) => (
               <div
                 key={m.id}
                 className={`msn-msg ${m.sender === "me" ? "msn-msg--me" : "msn-msg--other"}`}
@@ -242,8 +298,8 @@ export function MsnMessenger() {
               </div>
             ))}
 
-            {/* Typing indicator */}
-            {typing && (
+            {/* Typing indicator (offline auto-reply only) */}
+            {!liveActive && typing && (
               <div className="msn-typing">
                 {OWNER.displayName} is typing
                 <span className="msn-typing-dots">
@@ -343,7 +399,7 @@ export function MsnMessenger() {
               type="button"
               className="msn-send-btn"
               onClick={sendMessage}
-              disabled={!draft.trim()}
+              disabled={!draft.trim() || connectingLive}
             >
               Send
             </button>

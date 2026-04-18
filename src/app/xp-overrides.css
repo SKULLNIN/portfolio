@@ -5399,6 +5399,34 @@ a.ie-go-open-primary:active {
   margin-top: 2px;
 }
 
+.msn-live-banner {
+  padding: 8px 10px;
+  margin-bottom: 10px;
+  border-radius: 3px;
+  font-size: 11px;
+  line-height: 1.4;
+  border: 1px solid #c06060;
+  background: #fff0f0;
+  color: #7a1010;
+}
+
+.msn-live-banner--info {
+  border-color: #8ca8c8;
+  background: #eef4fb;
+  color: #2a4060;
+}
+
+.msn-live-banner-dismiss {
+  margin-left: 10px;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-family: inherit;
+  cursor: pointer;
+  border: 1px solid #a08080;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #fff 0%, #eee 100%);
+}
+
 /* Chat messages */
 .msn-msg {
   margin-bottom: 6px;
@@ -5688,6 +5716,288 @@ a.ie-go-open-primary:active {
 
 .msn-chat-messages::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(90deg, #b8b8a8 0%, #a0a090 100%);
+}
+
+/* ─── MSN Inbox (owner /msn-inbox) ─── */
+.msn-inbox-shell {
+  min-height: 100vh;
+  overflow: auto;
+  padding: 20px 16px 48px;
+  box-sizing: border-box;
+  background: linear-gradient(180deg, #6b9df0 0%, #4a7fc8 45%, #3568b8 100%);
+}
+
+.msn-inbox-window {
+  max-width: 920px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  max-height: min(92vh, 880px);
+  border: 1px solid #1a4a8a;
+  border-radius: 6px 6px 4px 4px;
+  box-shadow:
+    2px 3px 16px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  background: linear-gradient(180deg, #dce6f4 0%, #c8d8ec 50%, #b8cce4 100%);
+  font-family: Tahoma, "MS Sans Serif", sans-serif;
+  font-size: 12px;
+  color: #000;
+}
+
+.msn-inbox-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 10px 5px;
+  background: linear-gradient(180deg, #9ebfe8 0%, #6b9ae0 40%, #4a84d4 100%);
+  border-bottom: 1px solid #2a5aa8;
+  border-radius: 5px 5px 0 0;
+  flex-shrink: 0;
+}
+
+.msn-inbox-titlebar-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: bold;
+  font-size: 13px;
+  color: #fff;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.35);
+}
+
+.msn-inbox-titlebar-text img {
+  width: 18px;
+  height: 18px;
+}
+
+.msn-inbox-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.msn-inbox-body {
+  display: grid;
+  grid-template-columns: minmax(200px, 260px) 1fr;
+  gap: 0;
+  flex: 1;
+  min-height: 0;
+  border-top: 1px solid #a0b0c8;
+}
+
+@media (max-width: 680px) {
+  .msn-inbox-body {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+}
+
+.msn-inbox-sidebar {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-right: 1px solid #8ca8c8;
+  background: linear-gradient(180deg, #eef4fc 0%, #e0eaf6 100%);
+}
+
+.msn-inbox-sidebar-head {
+  padding: 8px 10px;
+  font-size: 11px;
+  font-weight: bold;
+  color: #1a3a6a;
+  border-bottom: 1px solid #c0d0e0;
+  background: linear-gradient(180deg, #f0f4fa 0%, #e4ebf4 100%);
+}
+
+.msn-inbox-conv-list {
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 180px;
+  max-height: min(52vh, 440px);
+}
+
+.msn-inbox-conv-btn {
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  margin-bottom: 4px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 11px;
+  color: #111;
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease;
+}
+
+.msn-inbox-conv-btn:hover {
+  border-color: #8ca8c8;
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.msn-inbox-conv-btn--active {
+  border-color: #2a6ab0;
+  background: linear-gradient(180deg, #e8f2ff 0%, #d4e6fc 100%);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.msn-inbox-conv-name {
+  font-weight: bold;
+  color: #0a246a;
+  margin-bottom: 2px;
+}
+
+.msn-inbox-conv-preview {
+  font-size: 10px;
+  color: #555;
+  line-height: 1.35;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.msn-inbox-main {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: #fff;
+  border-left: 1px solid #c0d0e0;
+}
+
+.msn-inbox-main-head {
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: bold;
+  color: #333;
+  border-bottom: 1px solid #c0d0e0;
+  background: linear-gradient(180deg, #f8fafc 0%, #eef2f8 100%);
+}
+
+.msn-inbox-msg-log {
+  flex: 1;
+  min-height: 200px;
+  max-height: min(48vh, 420px);
+  overflow-y: auto;
+  padding: 10px 12px;
+  background: #f5f7fb;
+}
+
+.msn-inbox-msg {
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid #d8dde8;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.msn-inbox-msg--guest {
+  border-left: 3px solid #c05030;
+}
+
+.msn-inbox-msg--owner {
+  border-left: 3px solid #2a6ab0;
+}
+
+.msn-inbox-msg-meta {
+  font-size: 10px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.msn-inbox-msg-meta strong {
+  color: #1a3a6a;
+}
+
+.msn-inbox-msg-body {
+  font-size: 12px;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.msn-inbox-compose {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  padding: 10px 12px;
+  border-top: 1px solid #c0d0e0;
+  background: linear-gradient(180deg, #eef2f8 0%, #e4eaf4 100%);
+}
+
+.msn-inbox-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.msn-inbox-field label {
+  display: block;
+  font-size: 10px;
+  color: #444;
+  margin-bottom: 4px;
+}
+
+.msn-inbox-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  font-family: inherit;
+  font-size: 12px;
+  border: 1px solid #a0a8b8;
+  border-radius: 3px;
+  background: #fff;
+}
+
+.msn-inbox-input:focus {
+  outline: 1px solid #4a84d4;
+  outline-offset: 0;
+}
+
+.msn-inbox-login {
+  padding: 16px 20px 20px;
+}
+
+.msn-inbox-login-hint {
+  margin: 0 0 12px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #333;
+}
+
+.msn-inbox-login-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.msn-inbox-status {
+  padding: 8px 12px;
+  font-size: 11px;
+  color: #555;
+  border-bottom: 1px solid #d8dde8;
+  background: #fafafa;
+}
+
+.msn-inbox-status--error {
+  color: #8a1010;
+  background: #fff5f5;
+  border-color: #e8c0c0;
+}
+
+.msn-inbox-empty {
+  padding: 24px;
+  text-align: center;
+  font-size: 11px;
+  color: #666;
 }
 
 /* ─── Winamp (Webamp) — floating player on the desktop, no XP chrome ─── */
